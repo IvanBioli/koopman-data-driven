@@ -1,0 +1,91 @@
+%Margins
+\usepackage[top=2.5cm, bottom=3cm, left=3cm, right=3cm]{geometry}
+\pagestyle{plain}
+
+%Packages
+\usepackage[english]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\let\openbox\relax
+\usepackage{amsthm}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{enumitem}
+\usepackage{csquotes}
+\usepackage{comment}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{mathtools}
+\usepackage{centernot}
+\usepackage{float}
+\usepackage{lipsum}
+
+%Tables
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\sisetup{output-decimal-marker={.}}
+
+%Algorithms
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+%MATLAB code and figures
+\usepackage{listings}
+\usepackage[framed,numbered]{matlab-prettifier}
+
+%Chapter enumeration
+\usepackage{titlesec}
+
+\titleformat{\chapter}[display]
+  {\Huge\bfseries}
+  {}
+  {0pt}
+  {\thechapter.\ }
+
+\titleformat{name=\chapter,numberless}[display]
+  {\Huge\bfseries}
+  {}
+  {0pt}
+  {}
+
+%Hyperlinks
+\usepackage{hyperref}
+
+%Bibliography 
+\usepackage[sorting=nyt, style=numeric, backend=biber]{biblatex}
+\addbibresource{bibliography.bib}
+
+%Algorithms
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+%Theorems
+\usepackage[noabbrev,nameinlink]{cleveref}
+
+\newtheorem{theorem}{Theorem}[chapter]
+\newtheorem{prop}[theorem]{Proposition}
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{definition}{Definition}[chapter]
+\newtheorem*{notation}{Notation}
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+\theoremstyle{remark}
+\newtheorem*{counterexample}{Counterexample}
+
+
+
+%Mathematical Symbols
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}	%Absolute value
+\DeclarePairedDelimiter{\norm}{\lVert}{\rVert}	%Norm
+\newcommand{\R}{\mathbb{R}}                     %Field of real numbers
+\newcommand{\C}{\mathbb{C}}                     %Field of complex numbers
+\newcommand{\Span}{\mathrm{Span}}               %Span
+\newcommand{\rank}{\mathrm{rank}}               %rank
+\newcommand{\range}{\mathrm{range}}             %range
+\newcommand{\diag}{\mathrm{diag}}               %diag
+\newcommand{\vecmat}{\mathrm{vec}}              %vec
+\newcommand{\Spec}{\mathrm{Spec}}               %Spec

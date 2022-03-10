@@ -1,0 +1,60 @@
+\documentclass[11pt, a4paper]{report}
+\usepackage{preamble}
+
+\begin{document}
+
+\begin{titlepage}
+    \newgeometry{top=4cm, bottom=4cm, left=2cm, right=2cm}
+	\centering
+    \includegraphics[width=0.4\linewidth]{epfl.png}\\[0.5cm] 	% University Logo
+    \textsc{\LARGE École Polytechnique Fédérale de Lausanne}\\
+    [0.7 cm]
+    \textsc{\LARGE Master in Computational Sciences and Engineering}\\
+    \vspace{\fill}
+    \textbf{\textsc{\fontsize{50}{50}\selectfont Draft Report}}\\ \vspace{\fill}		
+	\textsc{\LARGE Semester Project}\\[0.4cm]
+	\rule{\linewidth}{0.2 mm} \\[0.5 cm]
+	\begin{minipage}{0.4\textwidth}
+    \begin{flushleft} \large
+    \emph{Author:}\\
+    Ivan \textsc{Bioli} % Your name
+    \end{flushleft}
+    \end{minipage}
+    ~
+    \begin{minipage}{0.4\textwidth}
+    \begin{flushright} \large
+    \emph{Professor:} \\
+    Daniel \textsc{Kressner} \\
+    \emph{Supervisor:} \\
+    Alice \textsc{Cortinovis} \\
+    \end{flushright}
+    \end{minipage}\\
+	[2cm] \Large{\today}
+	
+\end{titlepage}
+\restoregeometry
+
+\begin{abstract}
+\thispagestyle{empty}
+TO DO
+\end{abstract}
+
+\clearpage
+\thispagestyle{empty}
+\tableofcontents
+
+%CONTENT
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+\chapter{Introduction}
+\input{introduction}
+
+
+%BIBLIOGRAPHY
+\nocite{*}
+\printbibliography
+
+\end{document}
+
+\end{document}
