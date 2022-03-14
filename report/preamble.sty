@@ -11,6 +11,7 @@
 \usepackage{amsfonts}
 \let\openbox\relax
 \usepackage{amsthm}
+\usepackage{physics}
 \usepackage{graphicx}
 \usepackage{subcaption}
 \usepackage{enumitem}
@@ -21,6 +22,7 @@
 \usepackage{centernot}
 \usepackage{float}
 \usepackage{lipsum}
+
 
 %Tables
 \usepackage{tabularx}
@@ -55,7 +57,7 @@
 \usepackage{hyperref}
 
 %Bibliography 
-\usepackage[sorting=nyt, style=numeric, backend=biber]{biblatex}
+\usepackage[sorting=nyt, style=numeric, backend=biber, url=false]{biblatex}
 \addbibresource{bibliography.bib}
 
 %Algorithms
@@ -79,12 +81,12 @@
 
 
 %Mathematical Symbols
-\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}	%Absolute value
-\DeclarePairedDelimiter{\norm}{\lVert}{\rVert}	%Norm
+%\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}	%Absolute value
+%\DeclarePairedDelimiter{\norm}{\lVert}{\rVert}	%Norm
 \newcommand{\R}{\mathbb{R}}                     %Field of real numbers
 \newcommand{\C}{\mathbb{C}}                     %Field of complex numbers
 \newcommand{\Span}{\mathrm{Span}}               %Span
-\newcommand{\rank}{\mathrm{rank}}               %rank
+%\newcommand{\rank}{\mathrm{rank}}               %rank
 \newcommand{\range}{\mathrm{range}}             %range
 \newcommand{\diag}{\mathrm{diag}}               %diag
 \newcommand{\vecmat}{\mathrm{vec}}              %vec
