@@ -61,4 +61,36 @@ and the evolution of the system is
     \label{evolution_linear}
     \vb{F}(\vb{x}) = \vb*{A}\vb{x}  = \sum_{j=1}^d \phi_j(\vb{x}) \vb*{A}\vb{v}_j = \sum_{j=1}^d \lambda_j \phi_j(\vb{x}) \vb{v}_j = \sum_{j=1}^d [\mathcal{K}\phi_j](\vb{x})\vb{v}_j.
 \end{equation}
-The decomposition in \eqref{decomposition_linear} is nothing more than an expansion of $\vb{x}$ as a linear combination of the vectors $\vb{v}_j$, where the $\phi_j(\vb{x})$ are the coefficients. However, from the Koopman Operator's viewpoint it is a linear expansion of the (vector) full state observable as a linear combination of the eigenfunctions of $\mathcal{K}$, where now the role of the coefficients is played by the vectors $\vb{v}_j$ \cite{rowley_spectral_2009}.  
+The decomposition in \eqref{decomposition_linear} is nothing more than an expansion of $\vb{x}$ as a linear combination of the vectors $\vb{v}_j$, where the $\phi_j(\vb{x})$ are the coefficients. However, from the Koopman Operator's viewpoint it is a linear expansion of the (vector) full state observable as a linear combination of the eigenfunctions of $\mathcal{K}$, where now the role of the coefficients is played by the vectors $\vb{v}_j$ \cite{rowley_spectral_2009}. 
+
+The vectors $\vb{v}_j$ are called \emph{Koopman modes} with respect to the observable $g$, which in this case is the full state (vector) observable $g(\vb{x}) = \vb{x}$. They are not associated with the Koopman Operator itself, but rather with the action of $\mathcal{K}$ on a particular observable. For instance if we consider another linear observable $g(\vb{x}) = \vb*{C}\vb{x}$ where $\vb*{C}\in\R^{m \times d}$ then we obtain
+\begin{equation*}
+	[\mathcal{K}g](\vb{x}) = g(\vb*{A}\vb{x})  = \sum_{j=1}^d \lambda_j \phi_j(\vb{x}) \vb*{C}\vb{v}_j.
+\end{equation*}
+i.e. $\{\vb*{C}\vb{v}_j\}_{j = 1}^d$ are the new Koopman modes.
+
+We can therefore conclude that for linear dynamical systems with simple spectrum the two formulations, the one using $\mathcal{K}$ and the one using $\vb*{F}$ are strictly linked and almost equivalent from the computational point of view. In particular, the full state observable can be expressed as combination of eigenfunctions derived from the eigenvectors of $\vb*{A}^*$ and the Koopman modes coincide with the eigenvectors of $\vb*{A}$. This can be generalized to the case of non-simple spectrum, i.e. $\vb*{A}$ non diagonalizable, defining generalized eigenfunctions strictly linked with the generalized eigenvectors of $\vb*{A}$. More in general, the properties of the Koopman operator can be obtained in a quite straightforward fashion from the standard spectral analysis of $\vb*{A}$ and $\vb*{A}^*$. We point the reader to \cite{mezic_spectrum_2019} for a more comprehensive analysis.
+
+\subsection{Koopman modes}
+So far, the Koopman Operator theory applied to the linear case did not provide any new insight in the analysis of the dynamical systems. Let us now consider the more general non-linear case, in which the linearisation introduced by the Koopman operator (at the price of an infinite dimensional space) can significantly help us.
+
+Let $g:\Omega\to\C^p$ be a vector valued observable. We can think of it as a vector gathering different measurements of the system state. Let us assume that each of its component $g_i$ lies in the closure of the Span of $J$ eigenfunctions of the Koopman Operator, where the case $J=+\infty$ is possible and often occurs. Then 
+\begin{equation*}
+	g_i = \sum_{j = 1}^J v_{ij}\phi_j, \qquad v_{ij}\in\C
+\end{equation*}
+and staking the weights into the vectors $\vb{v}_j = [v_{1j},\dots,v_{pj}]^T\in\C^p$ we can write
+\begin{equation}
+	g(\vb{x}) = \sum_{j = 1}^J \phi_j(\vb{x})\vb{v}_{j}.
+\end{equation}
+The vectors $\vb{v}_j$ are called the Koopman modes of the map $\vb{F}$ corresponding to the observable $g$. The evolution of the observable is then
+\begin{equation}
+	\label{evolution_nonlinear}
+	g(\vb{x}_n) = [\mathcal{K}^ng](\vb{x}_0) = \sum_{j = 1}^J \lambda_j^n\phi_j(\vb{x}_0)\vb{v}_{j}.
+\end{equation}
+From \eqref{evolution_nonlinear} we can understand that the Koopman eigenvalue $\lambda_j$ characterizes the contribute of the corresponding Koopman mode $\vb{v}_j$ to the evolution of the observable over time: the phase of $\lambda_j$ determines its frequency, while the magnitude determines the growth rate.
+
+As already discussed, the dynamical system defined by $\vb{F}$ and the one defined by $\mathcal{K}$ are two different ways of describing the same underlying phenomenon. The former is finite dimensional but in general non-linear, the latter is linear but infinite dimensional. The idea to link these two formulations is the full state observable $g(\vb{x}) = \vb{x}$ and the set $\{(\lambda_j, \phi_j, \vb{v}_j)\}_{j = 1}^J$ of $J$ tuples of Koopman eigenvalues, eigenfunctions and eigenmodes corresponding to the full state observable. Indeed, if the components of the full state observable lie in the Span of $\{(\lambda_j, \phi_j, \vb{v}_j)\}_{j = 1}^J$, the system evolution can be obtained either applying the complex and non-linear $\vb{F}$ to $\vb{x}$ or evolving $g$ linearly using $\mathcal{K}$ through
+\begin{equation*}
+	\vb{F}(\vb{x}) = [\mathcal{K}g](\vb{x}) = \sum_{j = 1}^J [\mathcal{K}\phi_j](\vb{x})\vb{v}_j = \sum_{j = 1}^J \lambda_j\phi_j(\vb{x})\vb{v}_j
+\end{equation*}
+with the behaviour of the system along each eigenfunction that is determined by the corresponding eigenvalue.
