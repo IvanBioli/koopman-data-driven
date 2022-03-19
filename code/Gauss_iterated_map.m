@@ -1,7 +1,7 @@
 %% PARAMETERS DEFINITION
 clear
 addpath(genpath(pwd))
-save = false;
+save = true;
 % Definition of the iteration function
 gauss_map = @(x, alpha, beta) exp(-alpha * x.^2) + beta;
 alpha = 2;
@@ -41,7 +41,7 @@ for k = keySet
     sgtitle(key);
     axis square
     if save
-        saveas(fig, "figures/gauss_map/ResDMD_"+key, 'eps')
+        saveas(fig, "figures/gauss_map/ResDMD_"+key, 'epsc')
         saveas(fig, "figures/gauss_map/ResDMD_"+key, 'png')
     end
     
@@ -71,6 +71,7 @@ x1 = F(x0);
 
 [tau, ~] = ResDMD_pseudospectrum(x0, x1, w, fun_dict, epsilon, grid);
 
+%%
 % Plotting the eigenvalues and the pseudospectra
 fig = figure();
 plot_eigenvalues(setdiff(results('Gauss-Legendre').lambdas, results('Gauss-Legendre').lambdas_res), 'r.')
@@ -84,7 +85,7 @@ end
 axis square
 
 if save
-    saveas(fig, 'figures/gauss_map/pseudospectra_contour', 'eps')
+    saveas(fig, 'figures/gauss_map/pseudospectra_contour', 'epsc')
     saveas(fig, 'figures/gauss_map/pseudospectra_contour', 'png')
 end
 %% CONVERGENCE OF THE GALERKIN MATRIX
@@ -146,6 +147,6 @@ loglog(Ms, y, 'k.', 'MarkerSize', 4)
 text(Ms(legend_index), y(legend_index) , '$\mathcal{O}(M^{-2})$', 'Interpreter','latex')
 
 if save
-    saveas(fig, 'figures/gauss_map/Galerkin_convergence', 'eps')
+    saveas(fig, 'figures/gauss_map/Galerkin_convergence', 'epsc')
     saveas(fig, 'figures/gauss_map/Galerkin_convergence', 'png')
 end

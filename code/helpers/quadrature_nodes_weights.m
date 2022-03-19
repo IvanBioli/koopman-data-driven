@@ -8,12 +8,12 @@ quadratures('Gauss-Legendre') = data;
 
 if flag
     % Trapezoidal
-    data.x0 = linspace(-1,0,M);
+    data.x0 = linspace(-1,0,M)';
     data.w = ones(M,1) / (M - 1); data.w(1) = data.w(1) / 2; data.w(end) = data.w(1);
     quadratures('Trapezoidal') = data;
 
     % Riemann sum
-    data.x0 = linspace(-1,0,M);
+    data.x0 = linspace(-1,0,M)';
     data.w = ones(M,1) / (M - 1);
     quadratures('Riemann sum') = data;
     

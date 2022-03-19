@@ -36,8 +36,11 @@ for theta = args
         ylabel('$x_2$', 'Interpreter','latex','FontSize',14)
         title("$\lambda = \exp{(" + num2str(theta) + "i)}$", 'Interpreter','latex','FontSize',14)
         if save
-            saveas(fig, "figures/pendulum/phase_portrait_"+num2str(theta* 1e4), 'eps')
-            saveas(fig, "figures/pendulum/phase_portrait_"+num2str(theta* 1e4), 'png')
+            set(gca,'LooseInset',get(gca,'TightInset'));
+%            saveas(fig, "figures/pendulum/phase_portrait_"+num2str(theta* 1e4), 'eps')
+%            saveas(fig, "figures/pendulum/phase_portrait_"+num2str(theta* 1e4), 'png')
+            exportgraphics(gca,"figures/pendulum/phase_portrait_"+num2str(theta* 1e4)+".png")
+            exportgraphics(gca,"figures/pendulum/phase_portrait_"+num2str(theta* 1e4)+".png")
         end
 end
 end

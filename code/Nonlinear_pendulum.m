@@ -48,7 +48,7 @@ psi_1 = psi_matrix(psi, x1);
 
 %% Phase portrait plots
 args = [0.4932, 0.9765, 1.4452, 1.8951];
-eigen_phase_portraits(args, psi, psi_0, psi_1, w, save)
+eigen_phase_portraits(args, psi, psi_0, psi_1, w, saving)
 
 %% ResDMD to control spectral pollution
 epsilon = 0.25;
@@ -76,7 +76,7 @@ end
 axis square
 title("$N_K = " + num2str(length(lambdas_EDMD)) + "$", 'Interpreter','latex', 'FontSize', 14)
 if saving
-    saveas(fig, "figures/pendulum/pendulum_N"+num2str(length(lambdas_EDMD)), 'eps')
+    saveas(fig, "figures/pendulum/pendulum_N"+num2str(length(lambdas_EDMD)), 'epsc')
     saveas(fig, "figures/pendulum/pendulum_N"+num2str(length(lambdas_EDMD)), 'png')
 end
 
