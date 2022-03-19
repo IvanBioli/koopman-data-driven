@@ -1,0 +1,340 @@
+\section{Dynamic Mode Decomposition (DMD)}
+Let us go back to the case of a linear dynamical system
+\begin{equation*}
+    \vb{x}_{n+1} = \vb*{A}\vb{x}_n, \qquad \vb*{A}\in\R^{n\times n}.
+\end{equation*}
+As already discussed, in order to extract the dynamic characteristics we need to analyze the spectral properties of $\vb{A}$. However, in a data-drive perspective, we cannot assume that we have access to $\vb*{A}$, but only to a sequence of snapshots. Therefore, we are interested in computing the eigenpairs of $\vb{A}$, or at least the dominant ones, from a sequence of snapshots
+\begin{equation*}
+    \label{krylov_space}
+    \vb*{V}_1^N = \left[\vb{v}_1, \vb{v}_2, \dots, \vb{v}_N\right] = \left[\vb{v}_1, \vb*{A}\vb{v}_1, \dots, \vb*{A}^N\vb{v}_1\right].
+\end{equation*}
+Since the columns of $\vb*{V}_1^N$ span a Krylov subspace, it is natural to apply a Krylov subspace method. Since we do not have access to the matrix $\vb*{A}$ and we cannot compute products of vectors by this matrix, we cannot directly apply numerically stable algorithms such as the Arnoldi method and we can rely only on the sequence of snapshots we are given in input. \emph{Dynamic Mode Decomposition} (DMD) \cite{schmid_dynamic_2010} is a variant of the Arnoldi method which does not require computing multiplications by $\vb*{A}$, nor any knowledge of the matrix. 
+
+Let us first suppose that, after a certain number of iterates, we found an $\vb*{A}$-invariant Krylov subspace and that $\vb{v}_N$ can be expressed as a linear combination of the previous linearly independent snapshots, i.e.
+\begin{equation}
+    \label{vn_exact}
+    \vb{v}_N = a_1 \vb{v}_1 + \dots + a_{N-1} \vb{v}_{N-1} = \vb{V}_1^{N-1}\vb{a}, \qquad \vb{a}\in\R^{N-1}.
+\end{equation}
+We can rewrite the relation in \eqref{vn_exact} as:
+\begin{equation*}
+    \vb*{A}\vb*{V}_1^{N-1} = \vb*{V}_2^{N} = \vb*{V}_1^{N-1}\vb*{S}
+\end{equation*}
+where $\vb*{S}$ is the companion matrix associated with $\vb{a}$, defined by:
+\begin{equation}
+    \label{S_definition}
+    \vb*{S} :=
+   \begin{bmatrix}
+   0     &        &       &      & a_1 \\
+   1     & 0      &       &      & a_2 \\
+         & \ddots & \ddots&      & \vdots \\ 
+         &        & 1     & 0    & a_{N-2} \\
+         &        &       & 1    & a_{N-1} \\
+   \end{bmatrix}.
+\end{equation}
+The eigenvalues of $\vb*{S}$ are also eigenvalues of $\vb*{A}$. Indeed, if $\vb*{S}\vb{x} = \lambda \vb{x}, \,\, \vb{x}\neq 0$ then $\vb{y} = \vb{V}_1^{N-1}\vb{x}\neq 0$ (we assumed that the first $N-1$ snapshots are linearly independent) and $\vb*{A}\vb{y} = \vb*{A}\vb{V}_1^{N-1}\vb{x} = \vb{V}_1^{N-1}\vb*{S}\vb{x} = \lambda \vb{V}_1^{N-1}\vb{x} = \lambda \vb{y}$.
+
+In general, $\vb{v}_N$ does not necessarily belong to the Span of the columns of $\vb*{V}_1^N$. However, as $N$ increases the snapshots tend to lie in the same direction (or at least in the same subspace) and we can expect that after a critical number of snapshots $\vb{v}_N$ \emph{almost} lies in the $\Span{(\vb*{V}_1^{N-1})}$, where by \emph{almost} we mean that the difference between $\vb{v}_N$ and its projection onto $\Span{(\vb*{V}_1^{N-1})}$ is small. Therefore, again assuming that the previous vectors are linearly independent, we we want to write
+\begin{equation}
+    \label{vn_error}
+    \begin{split}
+        & \vb{v}_N = a_1 \vb{v}_1 + \dots + a_{N-1} \vb{v}_{N-1} + \vb{r}, \qquad \text{i.e.}\\
+        & \vb*{A}\vb*{V}_1^{N-1}  = \vb*{V}_1^{N-1}\vb*{S} + \vb{r}\vb{e}_{N-1}^T
+    \end{split}
+\end{equation}
+so that we minimize the norm of the residual $\vb{r} = \vb{v}_N - \vb*{V}_1^{N-1}\vb{a}$. To solve the corresponding least square problem, we compute the thin QR-decomposition of $\vb*{V}_1^{N-1} = \vb*{Q}\vb*{R}$ and then we obtain
+\begin{equation}
+    \label{a_qrleastsquare}
+    \vb{a} = \vb*{R}^{-1} \vb*{Q}^*\vb{v}_N.
+\end{equation}
+The eigenvalues $\{\lambda_j\}_{j = 1}^{N-1}$ of the companion matrix $\vb*{S}$ are now approximations of the eigenvalues of $\vb*{A}$ and are called \emph{Ritz values}. The corresponding approximated eigenvectors $\vb{y}_j = \vb*{V}_1^{N-1}\vb{x}_j$, where $\vb{x}_j$ is an eigenvector of $\vb*{S}$ are the so called \emph{Ritz vectors}.
+
+The above mentioned method was the original version of the DMD \cite{schmid_dynamic_2010}. However, even if it mathematically correct and equivalent to the Arnoldi method in exact arithmetic (see \Cref{section_dmd_arnoldi}), an implementation using the companion matrix $\vb*{S}$ gives rise to a numerically unstable algorithm that is usually not capable to extract more than one or two dominant eigenpairs. Using the Singular Value Decomposition (SVD) it is possible to obtain a mathematically equivalent but better-conditioned algorithm, which might be particularly useful when $\vb*{V}_1^{N-1}$ is close to singular (it is very likely to happen for large $N$). This second version of the DMD is what nowadays is referred as DMD. Suppose that we computed a SVD of the snapshots matrix
+\begin{equation*}
+    \vb*{V}_1^{N-1} = \vb*{U}\vb*{\Sigma}\vb*{W}^* \qquad \vb*{\Sigma}\in\R^{N-1\times N-1},
+\end{equation*}
+we can now rewrite \eqref{vn_error} as
+\begin{equation}
+    \label{vn_error_rewritten}
+    \vb*{A}\vb*{U}\vb*{\Sigma}\vb*{W}^* = \vb*{U}\vb*{\Sigma}\vb*{W}^*\vb*{S} + \vb{r}\vb{e}_{N-1}^T = \vb*{V}_2^N
+\end{equation}
+and rearranging
+\begin{equation}
+    \label{S_tilde_definition}
+    \vb*{U}^*\vb*{A}\vb*{U} = \vb*{U}^*\vb*{V}_2^N\vb*{W}\vb*{\Sigma}^{-1} =: \widetilde{\vb*{S}}.
+\end{equation}
+Once we have computed the eigenpairs $\{(\lambda_j, \vb{x}_j)\}_j$ of the matrix $\widetilde{\vb*{S}}$, which in this case is a full matrix and not of companion type, we obtain the Ritz values and vectors as $\{(\lambda_j, \vb*{U}\vb{x}_j)\}_j$. 
+
+Besides the better conditioning, a great advantage of the SVD-based approach over the Arnoldi-based one is the opportunity to account for rank deficiency in $\vb*{V}_1^{N-1}$ and noise in the data by truncating the SVD of $\vb*{V}_1^{N-1}$. As observed in \cite{schmid_dynamic_2010}, without the use of TSVD it can be difficult to extract more than the first one or two dominant dynamic modes when using data from experiments, as the problem is ill-conditioned. 
+
+As previously mentioned, the two approaches are equivalent since $\vb*{S}$ and $\widetilde{\vb*{S}}$ are linked through a similarity transformation. The residual of the least squares solution is orthogonal to the columns of $\vb*{U}$, hence from \eqref{vn_error_rewritten} and \eqref{S_tilde_definition}:
+\begin{equation*}
+    \begin{split}
+    \widetilde{\vb*{S}} & =
+    \vb*{U}^*\vb*{V}_2^N\vb*{W}\vb*{\Sigma}^{-1} =
+    \vb*{U}^*(\vb*{U}\vb*{\Sigma}\vb*{W}^*\vb*{S} + \vb{r}\vb{e}_{N-1}^T)\vb*{W}\vb*{\Sigma}^{-1} = \\
+    & = (\vb*{\Sigma}\vb*{W}^*) \vb*{S} (\vb*{W}\vb*{\Sigma}^{-1}) =
+    (\vb*{\Sigma}\vb*{W}^*) \vb*{S} (\vb*{\Sigma}\vb*{W}^*)^{-1}    
+    \end{split}
+\end{equation*}
+
+The SVD-based version of DMD is summarized in \Cref{alg_dmd}.
+
+\begin{algorithm}
+\caption{\textbf{SVD-based DMD}}
+\label{alg_dmd}
+\textbf{Input:} $\vb{v}_1,\dots, \vb{v}_N$
+\begin{algorithmic}[1]
+\State Define the matrices $\vb*{V}_1^{N-1} = \left[\vb{v}_1,\dots,\vb{v}_{N-1}\right]$ and $\vb*{V}_2^{N} = \left[\vb{v}_2,\dots,\vb{v}_{N}\right]$.
+\State Compute the (eventually truncated) SVD of $\vb*{V}_1^{N-1} = \vb*{U}\vb*{\Sigma}\vb*{W}^*,\,\, \vb*{\Sigma}\in\R^{p\times p}$.
+\State Define the matrix $\widetilde{\vb*{S}} := \vb*{U}^*\vb*{V}_2^N\vb*{W}\vb*{\Sigma}^{-1}$.
+\State Compute the eigenpairs $\{(\lambda_j, \vb{x}_j)\}_j$ of $\widetilde{\vb*{S}}$.
+\State Compute the Ritz vector corresponding to the Ritz value $\lambda_j$ as $\vb{y}_j = \vb*{U}\vb{x}_j$. 
+\end{algorithmic}
+\textbf{Output:} Ritz values $\lambda_1,\dots,\lambda_{p}$ and corresponding Ritz vectors $\vb{y}_1,\dots, \vb{y}_p$
+\end{algorithm}
+
+The DMD algorithm presented above assumes that $\vb{x}_{n+1} = \vb*{A}\vb{x}_n$, i.e. that the system is and it is not clear what the algorithm produces for nonlinear dynamical systems. It can be shown that for nonlinear dynamics, the algorithm outputs, in some sense, approximations of the Koopman modes and associated eigenvalues with respect to a chosen observable \cite{rowley_spectral_2009, tu_dynamic_2014}. However, as discussed in \cite{tu_dynamic_2014}, this method has limitations in the case of nonlinear dynamics and it is therefore a better choice to use methods such as Extended DMD \cite{williams_data-driven_2015} (see \Cref{section_edmd}).
+
+
+\subsection{DMD and the Arnoldi method}
+\label{section_dmd_arnoldi}
+The Arnoldi method and the DMD are equivalent in exact arithmetic. In the following section we will discuss and prove this statement, underlining also why the Arnoldi algorithm is generally more stable.
+
+The Arnoldi method computes an orthonormal basis of the Krylov subspace spanned by the columns of $\vb*{V}_1^{N-1}$ computing the snapshots implicitly. In particular, the algorithm computes a matrix $\vb*{Q}_{N-1} = \left[\vb{q}_1,\dots, \vb{q}_{N-1}\right]$ with columns that form an orthonormal basis of $\Span{(\vb*{V}_1^{N-1})}$ and: 
+\begin{enumerate}[label=(\roman*)]
+    \item $\vb*{V}_1^{N-1} = \vb*{Q}_{N-1} \vb*{R}_{N-1}$ is a thin QR-decomposition (with $\vb*{R}_{N-1}$ that is computed implicitly);
+    \item $\vb*{H}_{N-1} = \vb*{Q}_{N-1}^* \vb*{A} \vb*{Q}_{N-1}$ is a Hessenberg matrix.
+\end{enumerate}
+Then the eigenpairs approximations are obtained from the eigenpairs of $\vb*{H}_{N-1}$.
+
+This is mathematically equivalent to the DMD algorithm. Indeed from \eqref{vn_error} and \eqref{a_qrleastsquare} the residual $\vb{r}$ can be written as
+\begin{equation*}
+    \vb{r} = \vb{v}_N - \vb*{V}_1^{N-1}\vb*{R}_{N-1}^{-1}\vb*{Q}_{N-1}^*\vb{v}_N = v_N - \vb*{Q}_{N-1}\vb*{Q}_{N-1}^*\vb{v}_N
+\end{equation*}
+and therefore $\vb*{Q}_{N-1}^*vb{r} = 0$. Finally plugging the QR-decomposition into \eqref{vn_error}
+\begin{equation*}
+    \vb*{A}\vb*{Q}_{N-1}\vb*{R}_{N-1} = \vb*{Q}_{N-1}\vb*{R}_{N-1}\vb*{S} + \vb{r}\vb{e}_{N-1}^T
+\end{equation*}
+and multiplying by $\vb*{Q}_{N-1}^*$ on the left and by $\vb*{R}_{N-1}^{-1}$ on the right
+\begin{equation}
+    \label{similarity_arnoldi_dmd}
+    \vb*{H}_{N-1} = \vb*{Q}_{N-1}\vb*{A}\vb*{Q}_{N-1} = \vb*{R}_{N-1}\vb*{S}\vb*{R}_{N-1}^{-1}.
+\end{equation}
+Hence $\vb*{H}_{N-1}$ and $\vb*{S}$ are linked through a similarity transformation.
+
+In spite of the fact that the two algorithms are equivalent mathematically and in exact arithmetic, the Arnoldi algorithm is numerically more stable. Indeed, as already discussed, as the number of snapshot increases the vectors tend to become linearly dependent and therefore the matrix $V_1^N$ becomes close to singular, hence ill-conditioned. Computing its QR-decomposition and $\vb{a} = \vb*{R}_{N-1}^{-1} \vb*{Q}_{N-1}^*\vb{v}_N$ might produce inaccurate results in floating point arithmetic. Even if the previously mentioned problem can be partially solved using the SVD-based DMD and performing a truncated SVD, there is another major problem the is intrinsic to the data-driven approach. One of the major strengths of the Arnoldi algorithm is that it does not even compute the vectors $\vb{x}_j = \vb*{A}^j \vb{x}_0$ because errors are already done in these computations. However, in a data-driven perspective this is not possible since what we are given is a sequence of snapshots and not the matrix $\vb*{A}$. Hence, we trade-off better stability and convergence properties for an algorithm that only relies on $V_1^N$ and is therefore applicable to snapshots experimentally collected.
+
+\section{Extended Dynamic Mode Decomposition (EDMD)}
+\label{section_edmd}
+The \emph{Extended Dynamic Mode Decomposition} (EDMD), originally presented in \cite{williams_data-driven_2015}, is a method that seeks at approximating the Koopman operator as a finite dimensional operator and then approximate the Koopman (eigenvalue, eigenfunction, mode) tuples from this finite dimensional approximation. The algorithm requires in input:
+\begin{itemize}
+    \item a dataset of snapshot pairs of the system state, $\{(\vb{x}_0^{(m)}, \vb{x}_1^{(m)})\}_{m = 1}^M$ with $\vb{x}_1^{(m)} = \vb{F}(\vb{x}_0^{(m)})$;
+    \item a dictionary of observables $\mathcal{D} = \{\psi_1, \dots, \psi_K\} \subseteq \mathcal{D}(\mathcal{K})$. Let us define the vector-valued observable $\Psi:\Omega\to\C^{1\times k}$ as $\Psi(x) = [\psi_1(x), \dots, \psi_k(x)]$. The choice of the dictionary $\mathcal{D}$ is not easy and depends on the problem at hand. For the moment, let us assume that $\mathcal{D}$ is rich enough to approximate at least a few of the dominant Koopman eigenfunctions.
+\end{itemize}
+
+\subsection{Approximation of $\mathcal{K}$ and its eigenpairs}
+Let $\phi\in\Span(\mathcal{D})$, then we can write:
+\begin{equation*}
+    \phi = \sum_{k=1}^K a_k\psi_k = \Psi\vb{a}, \qquad \vb{a}\in\C^K.
+\end{equation*}
+We aim at generating $\vb*{K}\in\C^{k\times k}$ finite dimensional approximation of $\mathcal{K}$ such that
+\begin{equation}
+    \label{k_finite_dimensional}
+    \mathcal{K}\vb{\phi} = (\Psi \circ \vb{F})\vb{a} = \Psi\vb*K\vb{a} + r
+\end{equation}
+where the residual term $r = r(\vb{a}, \vb{x})$ is due to the fact that in general $\Span(\mathcal{D})$ is not $\mathcal{K}$-invariant. To obtain the "best" $\vb*{K}\in\C^{k\times k}$ it is natural to minimize the norm of the point-wise maximum of the residual of all possible $\phi\in\Span(\mathcal{D})$, i.e to solve the following problem \cite{colbrook_rigorous_2021}:
+\begin{equation}
+    \label{edmd_integral_problem}
+    \argmin_{\vb*{K}\in\C^{K\times K}}\int_{\Omega} \max_{\vb{a}\in\C^k \\ \norm{\vb{a}} = 1}\abs{r(\vb{a}, \vb{x})}^2 d\omega(\vb{x}) = 
+    \argmin_{\vb*{K}\in\C^{K\times K}}\int_{\Omega} \norm{\Psi(\vb{F}(\vb{x})) - \Psi(\vb{x})\vb*{K}}^2 d\omega(\vb{x}).
+\end{equation}
+
+We cannot directly compute the integral, thus we need to use a quadrature rule. We take as quadrature nodes our snapshot data $\{\vb{x}_0^{(m)}\}_{m = 1}^M$ with weights $\{w_m\}_{m = 1}^M$. The discretized problem reads:
+\begin{equation}
+\label{edmd_discretized_problem}
+\begin{split}
+    &\argmin_{\vb*{K}\in\C^{k\times k}} \sum_{j=1}^M w_j \norm{\Psi(\vb{F}(\vb{x}_0^{(j)})) - \Psi(\vb{x}_0^{(j)})\vb*{K}}^2 d\omega(\vb{x}) = \\
+    = &\argmin_{\vb*{K}\in\C^{k\times k}} \sum_{j=1}^M w_j \norm{\Psi(\vb{x}_1^{(j)}) - \Psi(\vb{x}_0^{(j)})\vb*{K}}^2 d\omega(\vb{x}).
+\end{split}    
+\end{equation}
+If we define the matrices
+\begin{align}
+\label{w_def}
+\vb*{W} = \diag(w_1,\dots,w_M)\in\R_+^{M\times M} \\
+\label{psi0_def}
+\Psi_0 = \left[\Psi(\vb{x}_0^{(1)})^T,\dots,\Psi(\vb{x}_0^{(M)})^T\right]^T\in\C^{M\times K} \\
+\label{psi1_def}
+\Psi_0 = \left[\Psi(\vb{x}_1^{(1)})^T,\dots,\Psi(\vb{x}_1^{(M)})^T\right]^T\in\C^{M\times K}
+\end{align}
+we can write the weighted least-square problem in \eqref{edmd_discretized_problem} as 
+\begin{equation}
+    \label{edmd_discretized_problem_matrix}
+    \argmin_{\vb*{K}\in\C^{k\times k}}\norm{\sqrt{\vb*{W}}(\Psi_1 - \Psi_0\vb*{K})}_F^2.
+\end{equation}
+Since this is a convex problem in $\vb*{K}$, it suffices to impose that the derivative (of the real and of the imaginary part) is zero, from which we get
+\begin{equation}
+    \label{discretized_problem_solution}
+    (\Psi_0^*\vb*{W}\Psi_0)\vb*{K} = \Psi_0^*\vb*{W}\Psi_1 \,\,\Longrightarrow\,\, \vb*{K} = (\Psi_0^*\vb*{W}\Psi_0)^{\dagger}(\Psi_0^*\vb*{W}\Psi_1).
+\end{equation}
+
+To approximate the eigenvalue-eigenfunction pair of the Koopman operator, we use the eigenpairs of its finite dimensional approximation $\vb*{K}$. If $\lambda_j$ is an eigenvalue of $\vb*{K}$ with eigenvector $\bm{\xi}_j$, an approximation of an eigenvalue-eigenfunction pair of $\mathcal{K}$ is $(\lambda_j, \phi_j = \Psi\bm{\xi}_j)$.
+
+A few final remarks for a practical implementation of the EDMD:
+\begin{itemize}
+    \item by reducing the size of the dictionary we may assume without loss of generality that the matrix $(\Psi_0^*\vb*{W}\Psi_0)$ is non-singular. However, in practice we might also consider the use of TSVD when computing the its pseudo-inverse.  
+    \item Instead of computing the matrix $\vb*{K} = (\Psi_0^*\vb*{W}\Psi_0)^{\dagger}(\Psi_0^*\vb*{W}\Psi_1)$ and then its eigenpairs, it is often numerically more stable to solve the generalized eigenvalue problem $(\Psi_0^*\vb*{W}\Psi_0)\bm{\xi} = \lambda(\Psi_0^*\vb*{W}\Psi_1)\bm{\xi}$.
+\end{itemize}
+
+\subsection{Approximation of the Koopman modes for the full state observable}
+Let us consider the full state observable
+\begin{equation}
+    \label{full_state_def}
+    \vb{g}(\vb{x}) = 
+    \begin{bmatrix}
+    g_1(\vb{x}) \\
+    \vdots \\
+    g_d(\vb{x})
+    \end{bmatrix} = 
+    \begin{bmatrix}
+    \vb{e}_1^*\vb{x} \\
+    \vdots \\
+    \vb{e}_d^*\vb{x}
+    \end{bmatrix} = \vb{x}.
+\end{equation}
+Let us assume that $g_i\in\Span(\mathcal{D})$ for all $i = 1,\dots,d$. If this is not the case an intermediate step to project $g_i$ onto $\Span(\mathcal{D})$ is required, with the accuracy strongly depending on the choice of the dictionary. If $g_i\in\Span(\mathcal{D})$ we can write
+\begin{equation}
+    g_i = \sum_{k=1}^K b_{ki}\psi_k = \Psi\vb{b}_i
+\end{equation}
+and in matrix form
+\begin{equation*}
+    \vb{g} = \vb*{B}^T\Psi^T = (\Psi\vb*{B})^T, \qquad \vb*{B} = \left[\vb{b}_1, \dots,\vb{b}_d\right]\in\C^{k\times d}.
+\end{equation*}
+
+Let $\bm{\Xi} = \left[\bm{\xi}_1,\dots,\bm{\xi}_K\right]$ be the matrix of the eigenvectors of $\vb*{K}$, the vector of approximate Koopman eigenfunctions $\Phi(\vb{x}) = \left[\phi_1(\vb{x}), \dots, \phi_K(\vb{x})\right]$ can be written as $\Phi = \Psi\bm{\Xi}$. Thus
+\begin{equation}
+    \vb{g} = \vb*{B}^T\Psi^T = \vb*{B}^T(\bm{\Xi}^T)^{-1}\Phi^T = (\bm{\Xi}\vb*{B})^T\Phi^T.
+\end{equation}
+Since $\bm{\Xi}$ is the matrix of the eigenvectors of $\vb*{K}$, its inverse is $\bm{\Xi}^{-1} = \left[\vb{u}_1, \dots, \vb{u}_K\right]$ where $\vb{u}_i$ is the left eigenvector of $\vb*{K}$ also associated with $\lambda_i$ and appropriately scaled so that $\vb{u}_i^*\bm{\xi}_i = 1$. We can therefore compute the left eigenvectors of and letting  $\vb*{V} = (\vb*{U}^*\vb*{B})^T$, then
+\begin{equation}
+    \vb{g} = \vb*{V}\Psi^T = \sum_{k=1}^K \vb{v}_k\psi_k,
+\end{equation}
+i.e. $\vb{v}_i = (\vb{u}_i^*\vb*{B})^T$ is the $i$-th Koopman mode.
+
+In conclusion, once we have computed the finite dimensional approximation $\vb*{K}$ of the Koopman operator:
+\begin{itemize}
+    \item the eigenvalues of $\vb*{K}$ are the EDMD approximation of the Koopman eigenvalues;
+    \item the right eigenvectors of $\vb*{K}$ generate the approximation of the eigenfunctions;
+    \item the left eigenvectors of $\vb*{K}$ generate the approximation of the Koopman modes.
+\end{itemize}
+
+\section{Spectral pollution and Residual DMD (ResDMD)}
+To compute the eigenvalues of the Koopman operator, we approximate the infinite-dimensional operator $\mathcal{K}$ by a finite matrix. Therefore, even if some of the eigenvalues produced by the EDMD algorithm are reliable, most of them are not. \emph{Pseudospectra} are a tool that allow us to detect this so called \emph{spectral pollution} \cite{colbrook_rigorous_2021}, i.e. spurious eigenvalues of the matrix $\vb*{K}$ that are only due to the discretization and have no connection with the latent Koopman operator. Given a matrix $\vb*{A}\in\C^{n\times n}$ and $\varepsilon > 0$, the $\varepsilon$-pseudospectrum o $\vb*{A}$ is defined as
+\begin{equation}
+    \label{pseudospectrum_matrix_def}
+    \sigma_{\varepsilon}(\vb*{A}) = \left\{ \lambda\in\C \text{ : } \norm{(\vb*{A} - \lambda \vb*{I})^{-1}} > \frac{1}{\varepsilon}\right\} = \bigcup_{\norm{\vb*{B}} \leq \varepsilon} \sigma(\vb*{A}+ \vb*{B}),
+\end{equation}
+where $\sigma(\vb*{M})$ indicates the spectrum of the matrix $\vb*{M}$. However, $\mathcal{K}$ is an infinite dimensional operator and might be undounded, hence following \cite{trefethen_spectra_2005} we can define
+\begin{equation}
+    \label{pseudospectrum_koopman_def}
+    \sigma_{\varepsilon}(\mathcal{K}) = \mathrm{cl}\left( \left\{ \lambda\in\C \text{ : } \norm{(\mathcal{K} - \lambda \cdot \mathrm{id})^{-1}} > \frac{1}{\varepsilon}\right\} \right) = \mathrm{cl}\left( \bigcup_{\norm{\vb*{B}} \leq \varepsilon} \sigma(\mathcal{K}+ \vb*{B}) \right)
+\end{equation}
+where $\mathrm{id}$ is the identity operator and $\mathrm{cl}$ is the closure of a set.
+
+\subsection{ResDMD to remove spectral pollution}
+The \emph{Residual DMD} (ResDMD) algorithm performs the same steps of EDMD, but then discards the approximated eigenpairs $\{(\lambda_j,\, \phi_j)\}_j$ that have a residual above a certain prescribed tolerance $\varepsilon$. Given a candidate eigenpair $(\lambda, \phi)$ of $\mathcal{K}$, where $\phi = \Psi\bm{\xi}$, to measure its accuracy we can consider the relative residual
+\begin{equation}
+    \label{residual_definiton}
+    \begin{split}
+        &\mathrm{res}(\lambda, \phi)^2 = \frac{\int_{\Omega} \abs{[\mathcal{K}\phi](x) - \lambda\phi(x)}^2\,\,d\omega(x)}{\int_{\Omega} \abs{\phi(x)}^2\,\,d\omega(x)} 
+        = \frac{\langle (\mathcal{K} - \lambda \cdot\mathrm{id})\phi, (\mathcal{K} - \lambda \cdot \mathrm{id})\phi \rangle}{\langle\phi , \phi \rangle} = \\
+        & = \frac{\sum_{j,k = 1}^K \overline{\xi}_j\xi_k \left( \langle\mathcal{K}\psi_k, \mathcal{K}\psi_j\rangle - \lambda \langle\psi_k, \mathcal{K}\psi_j\rangle - \overline{\lambda}\langle\mathcal{K}\psi_k, \psi_j\rangle + \abs{\lambda}^2 \langle\psi_k, \psi_j\rangle\right)}{\sum_{j,k = 1}^K \overline{\xi}_j\xi_k \langle\psi_k, \psi_j\rangle}.
+    \end{split}
+\end{equation}
+Once again, this integral cannot be computed exactly and to approximate it we use the same quadrature rule used to approximate \eqref{edmd_integral_problem}. Hence:
+\begin{equation}
+    \label{residual_approx}
+    \begin{split}
+        \mathrm{res}(\lambda, \phi)^2 &\approx \frac{\sum_{j,k = 1}^K \overline{\xi}_j\xi_k \left( (\Psi_1^*\vb*{W}\Psi_1)_{jk} - \lambda (\Psi_1^*\vb*{W}\Psi_0)_{jk} - \overline{\lambda}(\Psi_0^*\vb*{W}\Psi_1)_{jk} + \abs{\lambda}^2 (\Psi_0^*\vb*{W}\Psi_0)_{jk}\right)}{\sum_{j,k = 1}^K \overline{\xi}_j\xi_k (\Psi_0^*\vb*{W}\Psi_0)_{jk}} = \\ 
+        & = \frac{\bm{\xi}^* \left((\Psi_1^*\vb*{W}\Psi_1) - \lambda (\Psi_1^*\vb*{W}\Psi_0) - \overline{\lambda}(\Psi_0^*\vb*{W}\Psi_1) + \abs{\lambda}^2 (\Psi_0^*\vb*{W}\Psi_0)\right) \bm{\xi}}{\bm{\xi}^*(\Psi_0^*\vb*{W}\Psi_0)\bm{\xi}} =: \widetilde{\mathrm{res}}^2(\lambda, \phi).
+    \end{split}
+\end{equation}
+If $\widetilde{\mathrm{res}}(\lambda, \phi) > \varepsilon$, the eigenpair $(\lambda, \phi)$ is discarded. This algorithm is summarized in \textcolor{red}{ALGORITHM}. Observe that to compute the approximation of the residual we only need to compute $(\Psi_1^*\vb*{W}\Psi_1)$, because the other matrices are already computed in the standard EDMD algorithm. 
+
+The above described cleanup procedure avoids spectral pollution and if the quadrature converges, in the large data limit, removes eigenpairs with a residual above the prescribed tolerance $\varepsilon$ and retains only eigenpairs that are inside the $\varepsilon$-pseudospectrum of $\mathcal{K}$. 
+
+\subsection{ResDMD to approximate the pseudospectrum}
+In spite of the fact that the eigenvalues returned by \textcolor{red}{ALGORITHM} lie in the $\varepsilon$-pseudospectrum (in the large data limit), the eigenvalues of $\vb*{K}$ might not approximate the whole spectrum of $\mathcal{K}$ and therefore it might not be possible to approximate the whole $\varepsilon$-pseudospectrum of $\mathcal{K}$ using \textcolor{red}{ALGORITHM}. A simple modification of \textcolor{red}{ALGORITHM} allows us to draw an approximation of the $\varepsilon$-pseudospectrum of $\mathcal{K}$ starting from a grid of points in the complex plane. Give a point $z_j\in\C$ on a grid, we search the function $\psi_j$ in $\Span(\mathcal{D})$ that minimizes $\mathrm{res}(z_j, \phi)$, i.e. we solve
+\begin{equation}
+    \label{grid_continuous}
+    \tau_j = \min_{\vb{g}\in\C^K} \mathrm{res}(z_j, \Psi\vb{g}), \qquad \vb{g}_j = \argmin_{\vb{g}\in\C^K} \mathrm{res}(z_j, \Psi\vb{g}).
+\end{equation}
+Following \eqref{residual_approx}, the discretized problem reads:
+\begin{align}
+    \label{grid_discretized}
+    \tau_j = \min_{\vb{g}\in\C^K} \frac{\vb{g}^*\vb*{D}(z_j)\vb{g}}{\vb{g}^*(\Psi_0^*\vb*{W}\Psi_0)\vb{g}}\,\,, \qquad \vb{g}_j = \argmin_{\vb{g}\in\C^K} \frac{\vb{g}^*\vb*{D}(z_j)\vb{g}}{\vb{g}^*(\Psi_0^*\vb*{W}\Psi_0)\vb{g}} \\
+    \label{D(z)_definition}
+    \vb*{D}(z_j) = (\Psi_1^*\vb*{W}\Psi_1) - z_j (\Psi_1^*\vb*{W}\Psi_0) - \overline{z}_j(\Psi_0^*\vb*{W}\Psi_1) + \abs{z_j}^2 (\Psi_0^*\vb*{W}\Psi_0).
+\end{align}
+The matrices $(\Psi_0^*\vb*{W}\Psi_0)$ and $\vb*{D}(z_j)$ are hermitian positive semidefinite, thus from the properties of the Rayleigh quotient solving \eqref{grid_discretized} is equivalent to finding the smallest eigenvalue and the associated eigenvector of the generalized eigenvalue problem $\vb*{D}(z_j)\vb{g} = \tau(\Psi_0^*\vb*{W}\Psi_0)\vb{g}$, which allows for an efficient computation.
+
+The algorithm is summarized in \textcolor{red}{ALGORITHM2} Convergence guarantees for the approximation of the $\varepsilon$-pseudospectrum can be found in \cite{colbrook_rigorous_2021}.
+
+\section{Numerical Examples}
+We try in this section to reproduce some of the numerical examples in \cite{colbrook_rigorous_2021}.
+
+\subsection{Gauss iterated map}
+The Gauss iterated function is a function $F:\R\to\R$ defined by $F(x) $
+\begin{figure}[H]
+\centering
+\makebox[\textwidth][c]{
+    \includegraphics[width=0.25\linewidth]{../code/figures/gauss_map/ResDMD_Montecarlo.eps}
+    \hspace*{\fill}
+    \includegraphics[width=0.25\linewidth]{../code/figures/gauss_map/ResDMD_Riemann.eps}
+    \hspace*{\fill}
+    \includegraphics[width=0.25\linewidth]{../code/figures/gauss_map/ResDMD_Trapezoidal.eps}
+    \hspace*{\fill}
+    \includegraphics[width=0.25\linewidth]{../code/figures/gauss_map/ResDMD_Gauss-Legendre.eps}
+    \hspace*{\fill}
+}
+\caption{Test}
+    
+\smallskip
+\makebox[\textwidth][c]{
+    \begin{subfigure}{0.45\textwidth}
+        \includegraphics[width=\linewidth]{../code/figures/gauss_map/pseudospectra_contour.eps}
+        \caption{Test}
+    \end{subfigure}\hspace*{\fill}
+    \begin{subfigure}{0.45\textwidth}
+        \includegraphics[width=\linewidth]{../code/figures/gauss_map/Galerkin_convergence.eps}
+        \caption{Test}
+    \end{subfigure}\hspace*{\fill}
+        }
+\end{figure}
+
+\subsection{Nonlinear pendulum}
+\begin{figure}[h]
+\centering
+\makebox[\textwidth][c]{
+        \includegraphics[width=0.25\linewidth]{../code/figures/pendulum/phase_portrait_4932.png}
+        \hspace*{\fill}
+        \includegraphics[width=0.25\linewidth]{../code/figures/pendulum/phase_portrait_9765.png}
+        \hspace*{\fill}
+        \includegraphics[width=0.25\linewidth]{../code/figures/pendulum/phase_portrait_14452.png}
+        \includegraphics[width=0.25\linewidth]{../code/figures/pendulum/phase_portrait_18951.png}
+        \hspace*{\fill}}
+        \caption{Test}
+\end{figure}
+
+
+\begin{figure}[h]
+\makebox[\textwidth][c]{
+    \begin{subfigure}{0.45\textwidth}
+        \includegraphics[width=\linewidth]{../code/figures/pendulum/pendulum_N193.eps}
+        \caption{Test}
+    \end{subfigure}\hspace*{\fill}
+    \begin{subfigure}{0.45\textwidth}
+        \includegraphics[width=\linewidth]{../code/figures/pendulum/pendulum_N1265.eps}
+        \caption{Test}
+    \end{subfigure}\hspace*{\fill}
+        }
+\end{figure}
