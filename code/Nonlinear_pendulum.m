@@ -74,7 +74,7 @@ for e = epsilon_vals
     contour(real(grid), imag(grid), 2 * mask * e, 1, 'k', 'ShowText','on','LineWidth',1.5);
 end
 axis square
-title("$N_K = " + num2str(length(lambdas_EDMD)) + "$", 'Interpreter','latex', 'FontSize', 14)
+title("$K = " + num2str(length(lambdas_EDMD)) + "$", 'Interpreter','latex', 'FontSize', 14)
 if saving
     saveas(fig, "figures/pendulum/pendulum_N"+num2str(length(lambdas_EDMD)), 'epsc')
     saveas(fig, "figures/pendulum/pendulum_N"+num2str(length(lambdas_EDMD)), 'png')

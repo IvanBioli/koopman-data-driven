@@ -1,7 +1,7 @@
 %% PARAMETERS DEFINITION
 clear
 addpath(genpath(pwd))
-save = true;
+saving = true;
 % Definition of the iteration function
 gauss_map = @(x, alpha, beta) exp(-alpha * x.^2) + beta;
 alpha = 2;
@@ -40,7 +40,7 @@ for k = keySet
     plot_eigenvalues(lambdas_res, 'bx')
     sgtitle(key);
     axis square
-    if save
+    if saving
         saveas(fig, "figures/gauss_map/ResDMD_"+key, 'epsc')
         saveas(fig, "figures/gauss_map/ResDMD_"+key, 'png')
     end
@@ -84,7 +84,7 @@ for e = epsilon_vals
 end
 axis square
 
-if save
+if saving
     saveas(fig, 'figures/gauss_map/pseudospectra_contour', 'epsc')
     saveas(fig, 'figures/gauss_map/pseudospectra_contour', 'png')
 end
@@ -145,8 +145,9 @@ start = errors('Trapezoidal'); start = start(Ms > 1000); start = start(1);
 y = 6000 * start * 1./ Ms.^2;
 loglog(Ms, y, 'k.', 'MarkerSize', 4)
 text(Ms(legend_index), y(legend_index) , '$\mathcal{O}(M^{-2})$', 'Interpreter','latex')
-
-if save
+xlabel('M', 'Interpreter','latex');
+ylabel('$\max_{1\leq j,k \leq K} |(\Psi_0^* W \Psi_1)_{jk} - \langle\mathcal{K}\psi_k, \psi_j\rangle|$', 'Interpreter','latex');
+if saving
     saveas(fig, 'figures/gauss_map/Galerkin_convergence', 'epsc')
     saveas(fig, 'figures/gauss_map/Galerkin_convergence', 'png')
 end
