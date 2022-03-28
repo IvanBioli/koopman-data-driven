@@ -1,23 +1,27 @@
 # Semester Project - Koopman operator
 
-## Old parts
-- [ ] No need to store M dimensional matrices
-- [ ] How to compute B for Koopman modes?
-  - [ ] First approach, projection if doable
-  - [ ] Second approach, like in Kernelized EDMD paper
-- [ ] Can use Krylov
+## **TODO**
+### Old parts
+- [x] No need to store M dimensional matrices
+- [x] How to compute B for Koopman modes?
+- [x] Can use Krylov
 
-## Kernelized EDMD
-- [ ] Idea of the Kernelized approach and why is it necessary
-- [ ] Explain from Machine Learning lecture notes the computational advantage of such an approach
-- [ ] Proposition 6.1 and proof 
-- [ ] Possible choices of the Kernel
-- [ ] Why ResDMD does not work like this
-- [ ] How to adapt
+### Kernelized EDMD
+- [x] Idea of the Kernelized approach and why is it necessary
+- [x] Explain from Machine Learning lecture notes the computational advantage of such an approach
+- [x] Proposition 6.1 and proof 
+- [x] How to obtain eigenmodes
+- [x] Possible choices of the Kernel
+- [x] Why ResDMD does not work like this
+- [x] How to adapt
 - [ ] (Try to find an example)
 - [ ] (Implementation, maybe with old examples)
-- [ ] Write report
+- [x] Write report
 
-## Future developements
+### Future developements
+- [ ] Use an approach similar to the one of Kernelized ResDMD to find dictionary "automatically"
+  - [ ] Compare with the already impemented examples
+  - [ ] Test it with a new problem
+  - [ ] Try to prove something
 - [ ] Test also DMD and compare with others
-- [ ] Test everything with a real problem
+- [ ] Test everything, in particular kernelized approaches, with a real problem
