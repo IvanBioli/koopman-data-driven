@@ -29,7 +29,7 @@ else
     A = spdiags(d, 0, n, n);
 end
 Afun = @(x) A*x;
-x = rand(n,1);      % Initial vector
+x = rand(n,1); x = x/norm(x);      % Initial vector
 
 % Definition of the DMD input
 V = zeros(n, it+1);
@@ -99,8 +99,11 @@ for i = 1:k_plot
     semilogy(its, DMD_error(:,i), 'color', colors{3})
     semilogy(its, DMD_SVD_error(:,i), 'color', colors{4})
 end
-legend('Arnoldi NO reorth.', 'Arnoldi WITH reorth.', 'Arnoldi-based DMD', 'SVD-based DMD', 'Location', 'best')
-
+if include_no_reorth
+    legend('Arnoldi NO reorth.', 'Arnoldi WITH reorth.', 'Arnoldi-based DMD', 'SVD-based DMD', 'Location', 'best', 'Interpreter', 'latex')
+else
+    legend('Arnoldi', 'Arnoldi-based DMD', 'SVD-based DMD', 'Location', 'best', 'Interpreter', 'latex')
+end
 if saving
     saveas(fig, "figures/Arnoldi_vs_DMD", 'epsc')
     saveas(fig, "figures/Arnoldi_vs_DMD", 'png')

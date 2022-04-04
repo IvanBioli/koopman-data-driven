@@ -1,7 +1,7 @@
 %% PARAMETERS DEFINITION
 clear
 addpath(genpath(pwd))
-saving = false;
+saving = true;
 % Definition of the iteration function
 gauss_map = @(x, alpha, beta) exp(-alpha * x.^2) + beta;
 alpha = 2;
@@ -12,12 +12,11 @@ F = @(x) gauss_map(x, alpha, beta);
 N = 40;             % Size of the dictionary
 fun_dict = @(x) legendreP(0:N-1,2*x+1).*sqrt(2*(0:N-1) + 1);
 
-%M = 1000;            % Number of quadrature points
-M = 40;            % Number of quadrature points
+M = 1000;            % Number of quadrature points
 epsilon = 0.01;     % Tolerance for ResDMD
 
 %% QUADRATURE RULES
-flag = false;        % Flag for computing also for quadrature rules other than Gauss-Legendre
+flag = true;        % Flag for computing also for quadrature rules other than Gauss-Legendre
 quadratures = quadrature_nodes_weights(M, flag);
 
 %% DMD
@@ -36,7 +35,7 @@ for k = keySet
 
     fig = figure();
     plot_eigenvalues(lambdas, 'r.')
-    sgtitle(key);
+    title(key, 'FontSize', 20);
     axis square
     if saving
         saveas(fig, "figures/gauss_map/DMD_"+key, 'epsc')
@@ -66,15 +65,15 @@ for k = keySet
     [lambdas_res, KFun_res] = ResDMD(x0, x1, w, fun_dict, epsilon);
 
     fig = figure();
-    plot_eigenvalues(setdiff(lambdas, lambdas_res), 'r.', 'MarkerSize', 10)
+    plot_eigenvalues(setdiff(lambdas, lambdas_res), 'm.', 'MarkerSize', 10)
     hold on
-    plot_eigenvalues(lambdas_res, 'bx', 10)
+    plot_eigenvalues(lambdas_res, 'bx', 'MarkerSize', 10)
     
     % Plotting the eigenvalues computed using DMD
     lambdas_DMD = results_DMD(key).lambdas;
     plot_eigenvalues(lambdas_DMD, '+', 'color', [0.4660 0.6740 0.1880], 'MarkerSize', 10)
     
-    sgtitle(key);
+    title(key, 'FontSize', 20);
     axis square
     if saving
         saveas(fig, "figures/gauss_map/ResDMD_"+key, 'epsc')
