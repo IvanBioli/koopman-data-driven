@@ -93,8 +93,6 @@ The SVD-based version of DMD is summarized in \Cref{alg_dmd}.
 \textbf{Output:} Ritz values $\lambda_1,\dots,\lambda_{p}$ and corresponding Ritz vectors $\vb{y}_1,\dots, \vb{y}_p$
 \end{algorithm}
 
-The DMD algorithm presented above assumes that $\vb{x}_{n+1} = \vb*{A}\vb{x}_n$, i.e. that the system is and it is not clear what the algorithm produces for nonlinear dynamical systems. It can be shown that for nonlinear dynamics, the algorithm outputs, in some sense, approximations of the Koopman modes and associated eigenvalues with respect to a chosen observable \cite{rowley_spectral_2009, tu_dynamic_2014}. However, as discussed in \cite{tu_dynamic_2014}, this method has limitations in the case of nonlinear dynamics and it is, therefore, a better choice to use methods such as Extended DMD \cite{williams_data-driven_2015} (see \Cref{section_edmd}).
-
 
 \subsection{DMD and the Arnoldi method}
 \label{section_dmd_arnoldi}
@@ -123,6 +121,48 @@ and multiplying by $\vb*{Q}_{N-1}^*$ on the left and by $\vb*{R}_{N-1}^{-1}$ on 
 Hence $\vb*{H}_{N-1}$ and $\vb*{S}$ are linked through a similarity transformation.
 
 Although the two algorithms are equivalent mathematically and in exact arithmetic, the Arnoldi algorithm is numerically more stable. Indeed, as the number of snapshots increases, the vectors tend to become linearly dependent and therefore, the matrix $V_1^N$ becomes close to singular, hence ill-conditioned. Computing its QR-decomposition and $\vb{a} = \vb*{R}_{N-1}^{-1} \vb*{Q}_{N-1}^*\vb{v}_N$ might produce inaccurate results in floating-point arithmetic. Even if the previously mentioned problem can be partially solved using the SVD-based DMD and performing a truncated SVD, another major problem is intrinsic to the data-driven approach. One of the major strengths of the Arnoldi algorithm is that it does not even compute the vectors $\vb{x}_j = \vb*{A}^j \vb{x}_0$ because errors are already made in these computations. However, in a data-driven perspective, this is not possible since what we are given is a sequence of snapshots and not the matrix $\vb*{A}$. Hence, we trade-off better stability and convergence properties for an algorithm that only relies on $V_1^N$ and is therefore applicable to snapshots experimentally collected.
+
+To compare numerically the algorithms, we performed 50 iterations with the matrix of size \texttt{n = 400} defined as \texttt{A = diag([5; randn(n-1,1)])} and random starting vector \texttt{x = rand(n,1)} normalized. \Cref{arnoldi_vs_DMD} shows the convergence of the approximations of the three dominant eigenvalues. It can be seen that the Arnoldi method is able to approximate all of them up to the epsilon-machine-precision, while both DMD algorithm fail in extracting the third dominant eigenvalue. Among the two versions of DMD, the SVD-based DMD shows better performances due to a better numerical stability.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\linewidth]{../code/figures/Arnoldi_vs_DMD.eps}
+    \caption{Convergence of the three dominant eigenvalues for the Arnoldi method and the DMD algorithms.}
+    \label{arnoldi_vs_DMD}
+\end{figure}
+
+\subsection{DMD for the Koopman Operator}
+Suppose that instead of a snapshots along a single trajectory of snapshots $\vb{v}_1, \vb{v}_2, \dots, \vb{v}_N$ we are given snapshot pairs of the system state, $\{(\vb{x}_0^{(m)}, \vb{x}_1^{(m)})\}_{m = 1}^M$ with $\vb{x}_1^{(m)} = \vb{F}(\vb{x}_0^{(m)}) = \vb*{A}\vb{x}_0^{(m)}$. The first setting is just a particular case of the latter one, with $\vb{x}_0^{(m)} = \vb{v}_m,\,\,\vb{x}_1^{(m)} = \vb{v}_{m+1}$. However, even in the linear case, requiring in input only snapshot pairs instead of one trajectory allows us to explore as many different initial states as we want. This is of particular help if the trajectories tend to converge to an equilibrium. Let us define the data matrices
+\begin{equation}
+    \label{dmd_matrices}
+    \vb*{X}_0 = \left[\vb{x}_0^{(1)}, \dots, \vb{x}_0^{(M)}\right] \qquad \vb*{X}_1 = \left[\vb{x}_1^{(1)}, \dots, \vb{x}_1^{(M)}\right]
+\end{equation}
+then it holds $\vb*{A}\vb*{X}_0 = \vb*{X}_1$. Then the least-squares solution is $\hat{\vb*{A}} = \vb*{X}_1\vb*{X}_0^{\dagger}$ and the eigenvalues of $\vb*{A}$ are approximated by the eigenvalues of $\hat{\vb*{A}}$. The DMD eigenvalues and modes are defined as the nonzero eigenvalues and corresponding eigenvectors of $\hat{\vb*{A}}$, respectively.
+
+The version of the DMD algorithm presented above assumes that $\vb{x}_1^{(m)} = \vb{F}(\vb{x}_0^{(m)}) =  \vb*{A}\vb{x}_0^{(m)}$, i.e. that the system is linear. If the system is nonlinear, then $\hat{\vb*{A}}$ only provides the best-fit linear approximation of $\vb{F}$. However, even if the dynamics is nonlinear the Koopmam Operator is linear (and infinite dimensional). Therefore, we could apply the DMD algorithm to observables in order to obtain an approximation of the Koopman eigenvalues and modes. Let us consider a vector-valued observable $\vb{g} = \vb{g}(\vb{x})$ and its measurements over a set of arbitrary initial states $\{\vb{z}_1,\dots, \vb{z}_M\}$ and one step after. Let us define:
+\begin{equation}
+    \label{dmd_koopman_matrices}
+    \begin{split}
+        \vb*{G}_0 &= \left[\vb{g}(\vb{x}_1), \dots, \vb{g}(\vb{x}_M)\right] \\
+        \vb*{G}_1 &= \left[\vb{g}(\vb{F}(\vb{x}_1)), \dots, \vb{g}(\vb{F}(\vb{x}_M))\right] = \left[\mathcal{K}\vb{g}(\vb{x}_1), \dots, \mathcal{K}\vb{g}(\vb{x}_M)\right].\\
+    \end{split}
+\end{equation}
+In analogy to what has been done in the linear case, $\vb*{K} = \vb*{G}_1\vb*{G}_0^{\dagger}$ provides the best finite-dimensional approximation of the Koopman operator that can be achieved using the available data. Therefore, we can approximate the Koopman eigenvalues and modes from the eigendecomposition of $\vb*{K}$, as summarized in \Cref{alg_koopman_dmd}.
+
+\begin{algorithm}[h]
+\caption{\textbf{: DMD for Koopman Operator}}
+\label{alg_koopman_dmd}
+\textbf{Input:} Measurements of a vector values observable, collected in data matrices $\vb*{G}_0,\,\vb*{G}_1$ defined as in \eqref{dmd_koopman_matrices}.
+\begin{algorithmic}[1]
+\State Compute the (eventually truncated) SVD of $\vb*{G}_0 = \vb*{U}\vb*{\Sigma}\vb*{W}^*$.
+\State Define the matrix $\vb*{K} := \vb*{U}^*\vb*{G}_1\vb*{W}\vb*{\Sigma}^{\dagger}$.
+\State Compute the eigenpairs $\{(\lambda_j, \vb{x}_j)\}_j$ of $\vb*{K}$. Each nonzero eigenvalue is a DMD eigenvalue.
+\State Compute the modes corresponding to the nonzero eigenvalue $\lambda_j$ as $\vb{v}_j = \vb*{U}\vb{x}_j$. 
+\end{algorithmic}
+\textbf{Output:} Approximation of the Koopman eigenvalues ($\lambda_j$) and modes ($\vb{v}_j$).
+\end{algorithm}
+
+It can be shown that also for nonlinear dynamics \Cref{alg_koopman_dmd} outputs, under fairly restrictive hypothesis, approximations of the Koopman modes and associated eigenvalues with respect to a chosen observable \cite{rowley_spectral_2009, tu_dynamic_2014}. However, as discussed in \cite{tu_dynamic_2014}, this method has limitations in the case of nonlinear dynamics and it is, therefore, a better choice to use methods such as Extended DMD \cite{williams_data-driven_2015} (see \Cref{section_edmd}).
 
 \section{Extended Dynamic Mode Decomposition (EDMD)}
 \label{section_edmd}
@@ -164,7 +204,7 @@ If we define the matrices
 \label{psi0_def}
 \Psi_0 = \left[\Psi(\vb{x}_0^{(1)})^T,\dots,\Psi(\vb{x}_0^{(M)})^T\right]^T\in\C^{M\times K} \\
 \label{psi1_def}
-\Psi_0 = \left[\Psi(\vb{x}_1^{(1)})^T,\dots,\Psi(\vb{x}_1^{(M)})^T\right]^T\in\C^{M\times K}
+\Psi_1 = \left[\Psi(\vb{x}_1^{(1)})^T,\dots,\Psi(\vb{x}_1^{(M)})^T\right]^T\in\C^{M\times K}
 \end{align}
 we can write the weighted least-square problem in \eqref{edmd_discretized_problem} as 
 \begin{equation}
@@ -176,6 +216,8 @@ Since this is a convex problem in $\vb*{K}$, it suffices to impose that the deri
     \label{discretized_problem_solution}
     (\Psi_0^*\vb*{W}\Psi_0)\vb*{K} = \Psi_0^*\vb*{W}\Psi_1 \,\,\Longrightarrow\,\, \vb*{K} = (\Psi_0^*\vb*{W}\Psi_0)^{\dagger}(\Psi_0^*\vb*{W}\Psi_1).
 \end{equation}
+If the weights are the same for all quadrature points, then from the properties of the Moore-Penrose inverse $\vb{K} = \Psi_0^{\dagger} \Psi_1$ and we are back to same matrix that we would obtain applying the DMD algorithm with vector-valued observable $\Psi$.
+
 Observe that the matrices involved are
 \begin{equation*}
     \label{psi_rewriting}
@@ -253,7 +295,7 @@ If we are interested in an approximation of only a leading subset of eigenvalues
     \State Compute $\vb*{V} = (\vb*{U}^*\vb*{B})^T$, i.e $\vb{v}_j = (\vb{u}_j^*\vb*{B})^T$.
 \EndIf
 \end{algorithmic}
-\textbf{Output:} Approximation of the eigenvalues ($\lambda_j$), eigenfunctions ($\phi_j$) and, eventually, eigemodes ($\vb{v}_j$).
+\textbf{Output:} Approximation of the Koopman eigenvalues ($\lambda_j$), eigenfunctions ($\phi_j$) and, eventually, eigemodes ($\vb{v}_j$).
 \end{algorithm}
 
 
