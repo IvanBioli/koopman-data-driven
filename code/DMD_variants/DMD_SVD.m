@@ -3,7 +3,7 @@ function [Q,lambdas] = DMD_SVD(V)
 %   Detailed explanation goes here
     
 [U,S,W] = svd(V(:, 1:end-1),'econ'); % ADD TSVD???
-S_tilde = U' * V(:, 2:end) * W * diag(1./diag(S)); 
+S_tilde = U' * V(:, 2:end) * W * pinv(S); 
 
 % Computation of the Ritz values and vectors
 [Q, lambdas] = eig(S_tilde, 'vector');

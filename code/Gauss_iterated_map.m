@@ -1,7 +1,7 @@
 %% PARAMETERS DEFINITION
 clear
 addpath(genpath(pwd))
-saving = true;
+saving = false;
 % Definition of the iteration function
 gauss_map = @(x, alpha, beta) exp(-alpha * x.^2) + beta;
 alpha = 2;
@@ -12,12 +12,43 @@ F = @(x) gauss_map(x, alpha, beta);
 N = 40;             % Size of the dictionary
 fun_dict = @(x) legendreP(0:N-1,2*x+1).*sqrt(2*(0:N-1) + 1);
 
-M = 100;            % Number of quadrature points
+%M = 1000;            % Number of quadrature points
+M = 40;            % Number of quadrature points
 epsilon = 0.01;     % Tolerance for ResDMD
 
 %% QUADRATURE RULES
-flag = true;        % Flag for computing also for quadrature rules other than Gauss-Legendre
+flag = false;        % Flag for computing also for quadrature rules other than Gauss-Legendre
 quadratures = quadrature_nodes_weights(M, flag);
+
+%% DMD
+keySet = keys(quadratures);
+results_DMD = containers.Map;
+
+for k = keySet
+    key = string(k);
+    x0 = quadratures(key).x0;
+    x1 = F(x0);
+
+    psi_0 = psi_matrix(fun_dict, x0); psi_0 = psi_0';
+    psi_1 = psi_matrix(fun_dict, x1); psi_1 = psi_1';
+
+    [Q,lambdas] = Snapshot_DMD(psi_0, psi_1);
+
+    fig = figure();
+    plot_eigenvalues(lambdas, 'r.')
+    sgtitle(key);
+    axis square
+    if saving
+        saveas(fig, "figures/gauss_map/DMD_"+key, 'epsc')
+        saveas(fig, "figures/gauss_map/DMD_"+key, 'png')
+    end
+    
+    % Saving the results
+    results_struct = struct( ...
+        'lambdas', lambdas);
+    results_DMD(key) = results_struct;
+    clear results_struct
+end
 
 %% EDMD and ResDMD
 keySet = keys(quadratures);
@@ -35,9 +66,14 @@ for k = keySet
     [lambdas_res, KFun_res] = ResDMD(x0, x1, w, fun_dict, epsilon);
 
     fig = figure();
-    plot_eigenvalues(setdiff(lambdas, lambdas_res), 'r.')
+    plot_eigenvalues(setdiff(lambdas, lambdas_res), 'r.', 'MarkerSize', 10)
     hold on
-    plot_eigenvalues(lambdas_res, 'bx')
+    plot_eigenvalues(lambdas_res, 'bx', 10)
+    
+    % Plotting the eigenvalues computed using DMD
+    lambdas_DMD = results_DMD(key).lambdas;
+    plot_eigenvalues(lambdas_DMD, '+', 'color', [0.4660 0.6740 0.1880], 'MarkerSize', 10)
+    
     sgtitle(key);
     axis square
     if saving

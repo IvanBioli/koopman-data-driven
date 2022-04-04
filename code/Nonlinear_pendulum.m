@@ -5,13 +5,18 @@ saving = true;
 
 delta_t = 0.5;          % Time step for discretization
 
-N = 100;                 % Hyperbolic cross approximation order
-M = 3 * 100 - 1;                 % Data points per dimension
+N = 20;                 % Hyperbolic cross approximation order
+if N == 20
+    M = 100 -1;
+    L = 10;
+else
+    M = 3 * 100 - 1;                 % Data points per dimension
+    L = 20;
+end
 
 %% TRAPEZOIDAL QUADRATURE NODES DEFINITION
 % Plotting the Hermite functions to understand where to truncate the
 % trapezoidal quadrature rule in x2 (which is applied in [-L, L])
-L = 20;
 n_points = 1000;
 x = linspace(-L,L,n_points);
 deg = 0:N;
@@ -46,15 +51,40 @@ psi_1 = psi_matrix(psi, x1);
 %% EDMD for eigenpairs computation
 [lambdas_EDMD, KFun_EDMD] = EDMD(x0, x1, w, psi, psi_0, psi_1);
 
+%% Comparison of DMD, EDMD and ResDMD
+epsilon = 0.25;
+[lambdas_ResDMD, KFun_ResDMD] = ResDMD(x0, x1, w, psi, epsilon, psi_0, psi_1);
+[Q,lambdas_DMD] = Snapshot_DMD(psi_0, psi_1);
+
+%% Plots
+fig = figure();
+% Drawing the unit circle
+theta = linspace(0, 2*pi, 1000);
+plot(exp(1i*theta), '-r', 'DisplayName', 'Unit circle')
+hold on
+
+% Plotting the eigenvalues computed using ResDMD
+plot_eigenvalues(setdiff(lambdas_EDMD, lambdas_ResDMD), 'm.', 'MarkerSize', 10, 'DisplayName', 'EDMD')
+plot_eigenvalues(lambdas_ResDMD, 'bx', 'Markersize', 10, 'DisplayName', "ResDMD")
+
+% Plotting the eigenvalues computed using DMD
+plot_eigenvalues(lambdas_DMD, '+', 'color', [0.4660 0.6740 0.1880], 'MarkerSize', 10, 'DisplayName', 'DMD')
+axis square
+axis equal
+legend('Interpreter','latex','Location','bestoutside')
+title("$K = " + num2str(length(lambdas_EDMD)) + "$", 'Interpreter','latex', 'FontSize', 20)
+
+if saving
+    saveas(fig, "figures/pendulum/pendulum_DMD__N"+num2str(length(lambdas_EDMD)), 'epsc')
+    saveas(fig, "figures/pendulum/pendulum_DMD_N"+num2str(length(lambdas_EDMD)), 'png')
+end
 %% Phase portrait plots
 args = [0.4932, 0.9765, 1.4452, 1.8951];
 eigen_phase_portraits(args, psi, psi_0, psi_1, w, saving)
 
-%% ResDMD to control spectral pollution
-epsilon = 0.25;
-%[lambdas_ResDMD, KFun_ResDMD] = ResDMD(x0, x1, w, psi, epsilon, psi_0, psi_1);
 %% ResDMD to estimate pseudospectrum
-N1 = 350; N2 = N1; a = 1.5;
+epsilon = 0.25;
+N1 = 500; N2 = N1; a = 1.5;
 grid = complexgrid(-a, a, N1, -a, a, N2);
 [tau, ~] = ResDMD_pseudospectrum(x0, x1, w, psi, epsilon, grid, psi_0, psi_1);
 %% Pseudospectrum plot
@@ -74,7 +104,7 @@ for e = epsilon_vals
     contour(real(grid), imag(grid), 2 * mask * e, 1, 'k', 'ShowText','on','LineWidth',1.5);
 end
 axis square
-title("$K = " + num2str(length(lambdas_EDMD)) + "$", 'Interpreter','latex', 'FontSize', 14)
+title("$K = " + num2str(length(lambdas_EDMD)) + "$", 'Interpreter','latex', 'FontSize', 20)
 if saving
     saveas(fig, "figures/pendulum/pendulum_N"+num2str(length(lambdas_EDMD)), 'epsc')
     saveas(fig, "figures/pendulum/pendulum_N"+num2str(length(lambdas_EDMD)), 'png')

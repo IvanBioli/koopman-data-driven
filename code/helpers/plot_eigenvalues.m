@@ -1,5 +1,5 @@
-function plot_eigenvalues(lambdas, marker)
-    plot(complex(lambdas), marker)
-    xlabel('Re(\lambda)');
-    ylabel('Im(\lambda)');
+function plot_eigenvalues(lambdas, varargin)
+    plot(complex(lambdas), varargin{:})
+    xlabel('$\Re(\lambda)$', 'Interpreter','latex');
+    ylabel('$\Im(\lambda)$', 'Interpreter','latex');
 end

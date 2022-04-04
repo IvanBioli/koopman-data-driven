@@ -32,9 +32,9 @@ for theta = args
         PhasePlot(z,-vals,'m');
         axis on
         set(gca,'TickLabelInterpreter','latex')
-        xlabel('$x_1$', 'Interpreter','latex','FontSize',14)
-        ylabel('$x_2$', 'Interpreter','latex','FontSize',14)
-        title("$\lambda = \exp{(" + num2str(theta) + "i)}$", 'Interpreter','latex','FontSize',14)
+        xlabel('$x_1$', 'Interpreter','latex','FontSize', 20)
+        ylabel('$x_2$', 'Interpreter','latex','FontSize', 20)
+        title("$\lambda = \exp{(" + num2str(theta) + "i)}$", 'Interpreter','latex','FontSize', 20)
         if save
             set(gca,'LooseInset',get(gca,'TightInset'));
 %            saveas(fig, "figures/pendulum/phase_portrait_"+num2str(theta* 1e4), 'eps')
