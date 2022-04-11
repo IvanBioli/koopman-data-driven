@@ -1,7 +1,7 @@
 %% PARAMETERS DEFINITION
 clear
 addpath(genpath(pwd))
-saving = false;
+saving = true;
 matrix = 'loss';
 include_no_reorth = false;
 
