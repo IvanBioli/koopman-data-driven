@@ -16,8 +16,16 @@ then sampling the trajectories with time steps $\Delta t$ we are back to the for
 The classical approach to the study of dynamical systems is the geometric one, originated by the work of Poincaré \cite{henri_poincare_les_1899}. However, this geometric viewpoint, based on fixed points, local behaviours and invariant manifolds, is ill-suited to many real-world applications \cite{budisic_applied_2012}. As pointed out in \cite{colbrook_rigorous_2021}, the fundamental challenges of Poincaré's approach in a data-driven perspective are two: non-linear dynamics, for which the geometric viewpoints provides good trajectories approximations only locally and not for all initial conditions, and unknown dynamics. The latter case typically arises when the system's dynamic is too complex to describe analytically or partially unknown, and we have only access to experimental data related to sequences of iterates sampled starting from different initial conditions. Koopman Operator theory \cite{koopman_dynamical_1932, koopman_hamiltonian_1931} provides an alternative viewpoint, which is a general framework for connecting data and measurements to the state space of a dynamical system \cite{arbabi_introduction_nodate}.
 
 \section{Definition of the Koopman Operator}
-When dealing with real-world applications, especially when the dynamics are unknown, the state of the dynamical system is indirectly measured through data, which are variables related to the system's state. We can mathematically formulate this assuming that data is evaluations of functions of the states. A function $g:\Omega\to\C$ used to measure the state of the dynamical system indirectly is called an \emph{observable}. 
-Our goal is to be able to approximate as accurately as possible the dynamics of the system. To do so from experimental data, i.e. from measurements, we need to understand how the observables evolve over time and here is where the Koopman Operator comes into play. The Koopman Operator advances the measurement forward in time by one-time step: it takes the state, advances the system by one-time step and measures the system again. Given an observable $g:\Omega\to\C$, we define $[\mathcal{K}g](\vb{x}) = g(\vb{F}(\vb{x}))$. It is typical to define the Koopman Operator on (a subset of) the Hilbert space $L^2(\Omega, \omega)$, where $\omega$ is a positive measure on the state-space. Hence, given a suitable domain of observables $\mathcal{D}(\mathcal{K}) \subseteq L^2(\Omega, \omega)$ we define:
+When dealing with real-world applications, especially when the dynamics are unknown, the state of the dynamical system is indirectly measured through data, which are variables related to the system's state. We can mathematically formulate this assuming that data is evaluations of functions of the states, leading to the following definition.
+
+\begin{definition}[Observable]
+A function $g:\Omega\to\C$ used to indirectly measure the state of the dynamical system is called an observable. 
+\end{definition}
+
+Our goal is to be able to approximate as accurately as possible the dynamics of the system. To do so from experimental data, i.e. from measurements, we need to understand how the observables evolve over time and here is where the Koopman Operator comes into play. The Koopman Operator advances the measurement forward in time by one-time step: it takes the state, advances the system by one-time step and measures the system again. Given an observable $g:\Omega\to\C$, we define $[\mathcal{K}g](\vb{x}) = g(\vb{F}(\vb{x}))$. It is typical to define the Koopman Operator on (a subset of) the Hilbert space $L^2(\Omega, \omega)$, where $\omega$ is a positive measure on the state-space (in our examples we will use only the Lebesgue measure).
+
+\begin{definition}[Koopman Operator]
+Let $\Omega$ be the state-space of the dynamical system described by $\vb{F}:\Omega\to\Omega$ and let $\omega$ be a positive measure on the state-space. Given a suitable domain of observables $\mathcal{D}(\mathcal{K}) \subseteq L^2(\Omega, \omega)$ we define the Koopman Operator as:
 \begin{equation}
     \label{koopman_def}
     \begin{split}
@@ -25,7 +33,8 @@ Our goal is to be able to approximate as accurately as possible the dynamics of 
        \\
        g & \longmapsto g \circ \vb{F}
     \end{split}    
-\end{equation}
+\end{equation} 
+\end{definition}
 
 We can think of the Koopman Operator as lifting the dynamics from the state space to the space of observables. From this lifting, we gain that, regardless of the linearity or nonlinearity of $\vb{F}$, the Koopman Operator is a linear operator and therefore, to understand the dynamics of the system, we can analyze the spectral properties of $\mathcal{K}$. However, the disadvantage is that the space of the observables is infinite-dimensional and $\mathcal{K}$ can have a continuous spectrum. 
 
@@ -39,28 +48,37 @@ Let $\phi_j:\Omega\to\Omega$ be an observable of the dynamical system and let $\
 Observing that the composition of function is not only linear but also preserves the product, i.e. $(g_1 \cdot g_2) \circ f = (g_1 \circ f) \cdot (g_2 \circ f)$, it is straightforward that $\mathcal{K}(g_1\cdot g_2) = \mathcal{K}g_1\cdot \mathcal{K}g_2$. The following lemma is therefore trivial.
 \begin{lemma}
 \label{eigenpair_multiplication}
-Let $(\phi_j, \,\lambda_j)$ and $(\phi_k, \,\lambda_k)$ be two not necessarily distinct eigenpairs of $\mathcal{K}$. Then also $(\phi_j\cdot\phi_k, \,\lambda_j\cdot\lambda_k)$ is an eigenpair of $\mathcal{K}$. In particular, given an eigenpair $(\phi, \,\lambda)$, also $(\phi^k, \,\lambda^k)$ is an eigenpair of $\mathcal{K}$ $\forall k\in\mathbb{N},\,\, k \geq 0$.
+Let $(\phi_j, \,\lambda_j)$ and $(\phi_k, \,\lambda_k)$ be two not necessarily distinct eigenpairs of $\mathcal{K}$, such that the supports of $\phi_j$ and $\phi_k$ have an intersection with nonzero measure. Then also $(\phi_j\cdot\phi_k, \,\lambda_j\cdot\lambda_k)$ is an eigenpair of $\mathcal{K}$. In particular, given an eigenpair $(\phi, \,\lambda)$, also $(\phi^k, \,\lambda^k)$ is an eigenpair of $\mathcal{K}$ $\forall k\in\mathbb{N},\,\, k \geq 0$.
 \end{lemma}
 
 \subsection{Linear systems with simple spectrum}
 Let us consider the case in which $\vb{F}(\vb{x}) = \vb*{A}\vb{x}$, $\vb*{A}\in\R^{d\times d}$, i.e. the linear case. Then the eigenvalues of $\vb*{A}$ are eigenvalues of $\mathcal{K}$ and the eigenvectors of $\vb*{A}$ are closely related to the associated eigenfunctions.
 
-Let $\lambda$ be an eigenvector of $\vb*{A}$ and let $\vb{w}$ be an associated left eigenvector, i.e. an eigenvector of $\vb*{A}^*$ associated with $\overline{\lambda}$. If we define $\phi(\vb{x}) = \langle \vb{x},\vb{w} \rangle$, then
+\begin{prop}
+Let $\lambda$ be an eigenvector of $\vb*{A}$, let $\vb{w}$ be an associated left eigenvector, i.e. an eigenvector of $\vb*{A}^*$ associated with $\overline{\lambda}$, and let us define $\phi(\vb{x}) = \langle \vb{x},\vb{w} \rangle$. Then $\lambda$ is an eigenvalue of $\mathcal{K}$, with corresponding eigenfunction $\phi$.
+\end{prop}
+\begin{proof}
 \begin{equation*}
     [\mathcal{K}\phi](\vb{x}) = \phi(\vb*{A}\vb{x}) = \langle \vb*{A}\vb{x},\vb{w} \rangle = \langle \vb{x}, \vb*{A}^*\vb{w} \rangle = \langle \vb{x}, \overline{\lambda}\vb{w} \rangle = \lambda \langle \vb{x},\vb{w} \rangle = \lambda \phi(\vb{x})
 \end{equation*}
-Hence $\lambda$ is an eigenvalue of $\mathcal{K}$, with corresponding eigenfunction $\phi$. Let us observe that, even in this very simple setting, from \Cref{eigenpair_multiplication} we obtain that if $\vb*{A}$ has at least one eigenvalue that is not a root of unity, then $\mathcal{K}$ has an infinite number of eigenvalues.
+Hence $\lambda$ is an eigenvalue of $\mathcal{K}$, with corresponding eigenfunction $\phi$.
+\end{proof}
 
-If in addition we make the assumption that $\vb*{A}$ is diagonalizable with a full set of eigenpairs $\{(\lambda_j, \vb{v}_j)\}_{j=1}^{d}$, it is possible to choose the corresponding eigenpairs $\{(\overline{\lambda}_j, \vb{w}_j)\}_{j=1}^{d}$ of $\vb*{A}^*$ such that $\langle \vb{v}_j, \vb{w}_k\rangle = \delta_{k,j}$. Therefore we can write for all $\vb{x}\in\R^d$:
+Let us observe that, even in this very simple setting, from \Cref{eigenpair_multiplication} we obtain that if $\vb*{A}$ has at least one nonzero eigenvalue that is not a root of unity, then $\mathcal{K}$ has an infinite number of eigenvalues.
+
+\begin{corollary}
+Let us assume that $\vb*{A}\in\R^{d\times d}$ is diagonalizable with a full set of eigenpairs $\{(\lambda_j, \vb{v}_j)\}_{j=1}^{d}$. Let $\{(\overline{\lambda}_j, \vb{w}_j)\}_{j=1}^{d}$ be the eigenpairs of of $\vb*{A}^*$, with $\{\vb{w}_j)\}_{j=1}^{d}$ such that $\langle \vb{v}_j, \vb{w}_k\rangle = \delta_{k,j}$. Then we can rewrite $\vb{x}\in\R^d$:
 \begin{equation}
     \label{decomposition_linear}
     \vb{x} = \sum_{j=1}^d \langle \vb{x}, \vb{w}_j\rangle \vb{v}_j = \sum_{j=1}^d \phi_j(\vb{x}) \vb{v}_j
 \end{equation}
-and the evolution of the system is
+and the evolution of the system reads
 \begin{equation}
     \label{evolution_linear}
     \vb{F}(\vb{x}) = \vb*{A}\vb{x}  = \sum_{j=1}^d \phi_j(\vb{x}) \vb*{A}\vb{v}_j = \sum_{j=1}^d \lambda_j \phi_j(\vb{x}) \vb{v}_j = \sum_{j=1}^d [\mathcal{K}\phi_j](\vb{x})\vb{v}_j.
 \end{equation}
+\end{corollary}
+
 The decomposition in \eqref{decomposition_linear} is nothing more than an expansion of $\vb{x}$ as a linear combination of the vectors $\vb{v}_j$, where the $\phi_j(\vb{x})$ are the coefficients. However, from the Koopman Operator's viewpoint, it is a linear expansion of the (vector) full state observable as a linear combination of the eigenfunctions of $\mathcal{K}$, where now the role of the coefficients is played by the vectors $\vb{v}_j$ \cite{rowley_spectral_2009}. 
 
 The vectors $\vb{v}_j$ are called \emph{Koopman modes} with respect to the observable $g$, which in this case is the full state (vector) observable $g(\vb{x}) = \vb{x}$. They are not associated with the Koopman Operator itself, but rather with the action of $\mathcal{K}$ on a particular observable. For instance if we consider another linear observable $g(\vb{x}) = \vb*{C}\vb{x}$ where $\vb*{C}\in\R^{m \times d}$ then we obtain
@@ -69,21 +87,140 @@ The vectors $\vb{v}_j$ are called \emph{Koopman modes} with respect to the obser
 \end{equation*}
 i.e. $\{\vb*{C}\vb{v}_j\}_{j = 1}^d$ are the new Koopman modes.
 
-We can therefore conclude that for linear dynamical systems with simple spectrum, the two formulations, the one using $\mathcal{K}$ and the one using $\vb*{F}$, are strictly linked and almost equivalent from the computational point of view. In particular, the full state observable can be expressed as a combination of eigenfunctions derived from the eigenvectors of $\vb*{A}^*$ and the Koopman modes coincide with the eigenvectors of $\vb*{A}$. The previous discussion can be generalized to the case of non-simple spectrum, i.e. $\vb*{A}$ non-diagonalizable, defining generalized eigenfunctions strictly linked with the generalized eigenvectors of $\vb*{A}$. More in general, the properties of the Koopman Operator can be obtained in a pretty straightforward fashion from the standard spectral analysis of $\vb*{A}$ and $\vb*{A}^*$. We point the reader to \cite{mezic_spectrum_2019} for a more comprehensive analysis.
+We can therefore conclude that for linear dynamical systems with simple spectrum, the two formulations, the one using $\mathcal{K}$ and the one using $\vb*{F}$, are strictly linked. In particular, the full state observable can be expressed as a combination of eigenfunctions derived from the eigenvectors of $\vb*{A}^*$ and the Koopman modes coincide with the eigenvectors of $\vb*{A}$. 
 
-\subsection{Koopman modes}
+\subsection{Linear systems: general case}
+The previous discussion can be generalized to the case of non-simple spectrum \cite{mezic_spectrum_2019}, i.e. $\vb*{A}$ non-diagonalizable, defining generalized eigenfunctions strictly linked with the generalized eigenvectors of $\vb*{A}$.
+\begin{definition}
+\label{gen_eigenfunction_def}
+Let $\vb{A}\in\R^{d\times d}$ be a matrix with canonical Jordan form:
+\begin{equation*}
+    \vb*{J} = 
+    \begin{bmatrix}
+    \vb*{J}_{\lambda_1} & & & \\
+    & \vb*{J}_{\lambda_2} & & \\
+    & & \ddots & \\
+    & & & \vb*{J}_{\lambda_s} \\
+    \end{bmatrix}, \qquad 
+    \vb*{J}_{\lambda_h} =
+    \begin{bmatrix}
+    \lambda_h & 1 & & & \\
+    & \lambda_h & 1 & & \\
+    & & \ddots &\ddots & \\
+    & & & \lambda_h & 1\\
+    & & & & \lambda_i \\
+    \end{bmatrix} \in \C^{m_h}
+\end{equation*}
+and let $\vb{v}_h^1,\dots, \vb{v}_h^{m_h}$ be the generalized eigenvectors associated with the Jordan block $\vb*{J}_{\lambda_h}$, i.e.
+\begin{equation*}
+    \begin{split}
+        \vb*{A}\vb{v}_h^1 &= \lambda_h \vb{v}_h^1 \\
+        \vb*{A}\vb{v}_h^i &= \lambda_h \vb{v}_h^i + \vb{v}_h^{i-1} \qquad i = 2,\dots,m_h. 
+    \end{split}
+\end{equation*}
+Let $\vb{w}_h^i$ be the dual basis vector to $\vb{v}_h^i$. We define the generalized eigenfunction as
+\begin{equation}
+    \phi_h^i(\vb{x}) = \langle \vb{x}, \vb{w}_h^i \rangle.
+\end{equation}
+\end{definition}
+
+\begin{lemma}
+Let us consider the generalized eigenfunctions as in \Cref{gen_eigenfunction_def}. Then:
+\begin{equation*}
+    \begin{split}
+        [\mathcal{K}\phi_h^i](\vb{x}) &= \lambda_h \phi_h^i(\vb{x}) + \phi_h^{i+1}(\vb{x}) \qquad i = 1,\dots,m_h-1 \\
+        [\mathcal{K}\phi_h^{m_h}](\vb{x}) &= \lambda_h \phi_h^{m_h}(\vb{x})
+    \end{split}
+\end{equation*}
+\end{lemma}
+\begin{proof}
+The dual basis satisfies
+\begin{equation*}
+    \begin{split}
+        \vb*{A}^*\vb{w}_h^i &= \overline{\lambda_h} \vb{w}_h^i + \vb{w}_h^{i+1} \qquad i = 1,\dots,m_h-1 \\
+        \vb*{A}^*\vb{w}_h^{m_h} &= \overline{\lambda_h} \vb{w}_h^{m_h}
+    \end{split}
+\end{equation*}
+thus it holds for $i = 1,\dots,m_h-1 $:
+\begin{equation*}
+    \begin{split}
+        [\mathcal{K}\phi_h^i](\vb{x}) &= \phi_h^i(\vb*{A}\vb{x}) = \langle \vb*{A}\vb{x}, \vb{w}_h^i \rangle = \langle \vb{x}, \vb*{A}^*\vb{w}_h^i \rangle = \langle \vb{x}, \overline{\lambda_h} \vb{w}_h^i + \vb{w}_h^{i+1} \rangle = \\
+        & =  \lambda_h \langle \vb{x}, \vb{w}_h^i \rangle + \langle \vb{x}, \vb{w}_h^{i+1} \rangle = \lambda_h \phi_h^i(\vb{x}) + \phi_h^{i+1}(\vb{x})
+    \end{split}
+\end{equation*}
+and similarly $[\mathcal{K}\phi_h^{m_h}](\vb{x}) = \lambda_h \phi_h^{m_h}(\vb{x})$.
+\end{proof}
+
+Similarly to what has been done to the case of linear systems with simple spectrum, we can now recover the evolution of the full state observable and any linear observable from the above defined generalized eigenvalues
+\begin{prop}
+\label{prop_decomposition_jordan}
+Let $\vb{g}$ be the full state observable, i.e. $\vb{g}(\vb{x}) = \vb{x}$. Then
+\begin{equation*}
+    \vb{g}(\vb{x}) = \vb{x} = \sum_{h = 1}^{s}\sum_{i = 1}^{m_h}\langle \vb{x}, \vb{w}_h^i\rangle\vb{v}_h^i = \sum_{h = 1}^{s}\sum_{i = 1}^{m_h} \phi_h^i(\vb{x}) \vb{v}_h^i
+\end{equation*}
+and the evolution of the system reads:
+\begin{equation}
+\begin{split}
+    [\mathcal{K}\vb{g}](\vb{x}) &= \sum_{h = 1}^{s}\sum_{i = 1}^{m_h} [\mathcal{K}\phi_h^i](\vb{x}) \vb{v}_h^i = \sum_{h = 1}^{s} \left(\lambda_h\sum_{i = 1}^{m_h} \phi_h^i(\vb{x})\vb{v}_h^i + \sum_{i = 1}^{m_h-1}\phi_h^{i+1}(\vb{x})\vb{v}_h^i \right) =\\
+    &= \sum_{h = 1}^{s} \left(\lambda_h P_h(\vb{x}) + D_h(\vb{x}) \right)
+\end{split}
+\end{equation}
+where $P_h$ is the projection onto $\Span(\vb{v}_h^1,\dots,\vb{v}_h^{m_h})$ and $D_h$ is a nilpotent operator.
+\end{prop}
+\begin{proof}
+We just need to show that $D_h$ is really a nilpotent operator. It suffices to observe that $D_h$ is defined by
+\begin{equation}
+    D_h(x) = D_h\left(\sum_{h = 1}^{s}\sum_{i = 1}^{m_h} \phi_h^i(\vb{x}) \vb{v}_h^i\right) = \sum_{i = 1}^{m_h-1}\phi_h^{i+1}(\vb{x})\vb{v}_h^i = \sum_{i = 2}^{m_h}\phi_h^{i}(\vb{x})\vb{v}_h^{i-1}
+\end{equation}
+hence by induction:
+\begin{equation}
+    D_h^k(\vb{x}) = \sum_{i = k+1}^{m_h}\phi_h^{i}(\vb{x})\vb{v}_h^{i-k}
+\end{equation}
+where we use the convention that the sum is equal to zero if $k+1>m_h$, i.e. if $k > m_h$.
+\end{proof}
+
+\begin{corollary}
+Let $\vb*{A}\in\R^{d\times d}$ be a matrix and let $\mu_1, \dots, \mu_p$ be its eigenvalues, with algebraic multiplicity $\mathrm{am}_1, \dots, \mathrm{am}_p$. Let $\vb*{g}$ be the full state observable of the dynamical system described by $\vb*{A}$, then
+\begin{equation*}
+    [\mathcal{K}\vb{g}](\vb{x}) = \sum_{j = 1}^{p} \left(\mu_j P_j(\vb{x}) + D_j(\vb{x}) \right)
+\end{equation*}
+where $P_j$ is the projection onto the algebraic eigenspace associated with $\mu_j$, which is defined as the null space of $(\vb*{A} - \mu_j\vb*{I})^{\mathrm{ma}_j}$, and $D_j$ is a nilpotent operator of order equal to the maximum size of the Jordan blocks corresponding to the eigenvalue $\mu_j$. 
+\end{corollary}
+\begin{proof}
+From \Cref{prop_decomposition_jordan}, supposing that $\mu_j = \lambda_{h_1} = \dots = \lambda_{h_r}$ and $\mu_j \neq \lambda_{h}$ for $h\notin\{h_1,\dots, h_r\}$, we can define:
+\begin{equation*}
+    \begin{split}
+        P_j &= \sum_{i=1}^r P_{h_i}\\
+        D_j &= \sum_{i=1}^r D_{h_i}.
+    \end{split}
+\end{equation*}
+Then $P_j$ is the projection onto the algebraic eigenspace associated with $\mu_j$ and $D_{h_i}$ are nilpotent operators with maxiumum order equal to the maximum size of the Jordan blocks corresponding to the eigenvalue $\mu_j$. Since $D_{h_i}D_{h_k} = 0$ if $i\neq k$, it holds
+\begin{equation*}
+    D_j^k = \sum_{i=1}^r D_{h_i}^k
+\end{equation*}
+and the thesis follows.
+\end{proof}
+
+Hence the action of the Koopman Operator on the full state observable can be obtained from the standard spectral analysis of $\vb*{A}$ and $\vb*{A}^*$, and the same is true for all linear observables $g(\vb*{x}) = \langle \vb{c}, \vb{x} \rangle$.
+
+\subsection{Koopman Mode Decomposition: nonlinear systems}
 So far, the Koopman Operator theory applied to the linear case did not provide any new insight in the analysis of the dynamical systems. Let us now consider the more general non-linear case, in which the linearization introduced by the Koopman Operator (at the price of an infinite-dimensional space) can significantly help us.
 
-Let $g:\Omega\to\C^p$ be a vector valued observable. We can think of it as a vector gathering different measurements of the system state. Let us assume that each of its component $g_i$ lies in the closure of the Span of $J$ eigenfunctions of the Koopman Operator, where the case $J=+\infty$ is possible and often occurs. Then 
+We are interested in understanding the evolution of observables over time. This is particularly simple if the observable can be written as a linear combination of Koopman eigenfunctions. For this reason, the following definition was introduced in \cite{rowley_spectral_2009}.
+\begin{definition}[Koopman Mode Decomposition]
+Let $g:\Omega\to\C^p$ be a vector valued observable. Let us assume that each of its component $g_i$ lies in the closure of the Span of $J$ Koopman eigenfunctions, where the case $J=+\infty$ is possible and often occurs. Then we can write 
 \begin{equation*}
 	g_i = \sum_{j = 1}^J v_{ij}\phi_j, \qquad v_{ij}\in\C
 \end{equation*}
-and staking the weights into the vectors $\vb{v}_j = [v_{1j},\dots,v_{pj}]^T\in\C^p$ we can write
+and staking the weights into the vectors $\vb{v}_j = [v_{1j},\dots,v_{pj}]^T\in\C^p$ 
 \begin{equation}
     \label{koopman_modes}
 	g(\vb{x}) = \sum_{j = 1}^J \phi_j(\vb{x})\vb{v}_{j}.
 \end{equation}
-The vectors $\vb{v}_j$ are called the Koopman modes of the map $\vb{F}$ corresponding to the observable $g$. The evolution of the observable is then
+This type of decomposition based on the Koopman eigenfunctions is named Koopman Mode Decomposition (KMD). The vectors $\vb{v}_j$ are called the Koopman modes of the map $\vb{F}$ corresponding to the observable $g$. 
+\end{definition}
+
+We can think of a vector valued observable $\vb{g}$ as a vector gathering different measurements of the system state. By linearity of the Koopman operator, the evolution of the observable is
 \begin{equation}
 	\label{evolution_nonlinear}
 	g(\vb{x}_n) = [\mathcal{K}^ng](\vb{x}_0) = \sum_{j = 1}^J \lambda_j^n\phi_j(\vb{x}_0)\vb{v}_{j}.
