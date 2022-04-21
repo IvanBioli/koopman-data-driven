@@ -31,10 +31,10 @@ for k = keySet
     psi_0 = psi_matrix(fun_dict, x0); psi_0 = psi_0';
     psi_1 = psi_matrix(fun_dict, x1); psi_1 = psi_1';
 
-    [Q,lambdas] = Snapshot_DMD(psi_0, psi_1);
+    [Q,lambdas] = Snapshot_DMD(psi_0, psi_1, true);
 
     fig = figure();
-    plot_eigenvalues(lambdas, 'r.')
+    plot_eigenvalues(lambdas, 'go')
     title(key, 'FontSize', 20);
     axis square
     if saving
@@ -71,7 +71,7 @@ for k = keySet
     
     % Plotting the eigenvalues computed using DMD
     lambdas_DMD = results_DMD(key).lambdas;
-    plot_eigenvalues(lambdas_DMD, '+', 'color', [0.4660 0.6740 0.1880], 'MarkerSize', 10)
+    plot_eigenvalues(lambdas_DMD, 'go', 'MarkerSize', 10)
     
     title(key, 'FontSize', 20);
     axis square
@@ -91,6 +91,7 @@ for k = keySet
 end
 
 %% PSEUDOSPECTRUM APPROXIMATION
+disp('Starting Pseudospectrum Approximation')
 N1 = 1000; N2 = 1000;
 zoom_shift = 0.6;
 

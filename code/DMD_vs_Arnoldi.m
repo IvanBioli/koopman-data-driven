@@ -1,13 +1,13 @@
 %% PARAMETERS DEFINITION
 clear
+rng(0);
 addpath(genpath(pwd))
 saving = true;
-matrix = 'loss';
-include_no_reorth = false;
+matrix = '';
 
 n = 400;            % Size of the matrix
-it = 50;            % Number of iterations
-k = 6;              % Eigenpairs to monitor
+it = 60;            % Number of iterations
+k = 10;              % Eigenpairs to monitor
 
 % Definition of the matrix
 if strcmp(matrix, 'random')
@@ -16,7 +16,6 @@ if strcmp(matrix, 'random')
     d = eig(A);
     d = sort(d, 'descend');
 elseif strcmp(matrix, 'loss')
-    rng(0);
     e = sort([5; randn(n-1,1)]); 
     A = spdiags(e, 0, n, n); 
     A(1,end) = 1000;
@@ -39,20 +38,6 @@ for i = 2:it+1
 end
 
 %% ARNOLDI
-% ARNOLDI WITHOUT REORTHOGONALIZATION
-if include_no_reorth
-    [U, H] = arnoldi(x, Afun, it, 0);
-    
-    arnoldi_error = zeros(it, k);
-    arnoldi_error((1:it)' < (1:k)) = nan;
-    for i = 1:it
-        eigv = eig(H(1:i, 1:i));
-        eigv = sort(eigv,'descend');
-        eigv = eigv(1:min(i,k));
-        arnoldi_error(i, 1:min(i,k)) = abs(eigv - d(1:min(i,k)))';
-    end
-end
-% ARNOLDI WITH REORTHOGONALIZATION
 [U, H] = arnoldi(x, Afun, it, 0.7);
 
 arnoldi_reorth_error = zeros(it, k);
@@ -82,28 +67,31 @@ for i = 1:it
     DMD_SVD_error(i, 1:min(i,k)) = abs(lambdas(1:min(i,k)) - d(1:min(i,k)))';
 end
 
+%% TSVD - DMD
+DMD_TSVD_error = zeros(it, k);
+DMD_TSVD_error((1:it)' < (1:k)) = nan;
+for i = 1:it
+    [Q,lambdas] = DMD_SVD(V(:,1:i+1), true);
+    lambdas = sort(lambdas, 'descend');
+    idx = min([i,k, length(lambdas)]);
+    DMD_TSVD_error(i, 1:idx) = abs(lambdas(1:idx) - d(1:idx))';
+end
+
 %% PLOTS
 its = 1:it;
 k_plot = 3;
 
 fig = figure();
 %colors = {[0 0.4470 0.7410], [0.8500 0.3250 0.0980], [0.9290 0.6940 0.1250], [0.4940 0.1840 0.5560]};
-colors = {'m', 'b', 'r', 'k'};
+colors = {'b', 'r', 'k', 'm'};
 for i = 1:k_plot
-    if include_no_reorth
-        semilogy(its, arnoldi_error(:,i), 'color', colors{1})
-        hold on
-    end
-    semilogy(its, arnoldi_reorth_error(:,i), 'color', colors{2})
+    semilogy(its, arnoldi_reorth_error(:,i), 'color', colors{1})
     hold on
-    semilogy(its, DMD_error(:,i), 'color', colors{3})
-    semilogy(its, DMD_SVD_error(:,i), 'color', colors{4})
+    semilogy(its, DMD_error(:,i), 'color', colors{2})
+    semilogy(its, DMD_SVD_error(:,i), 'color', colors{3})
+    semilogy(its, DMD_TSVD_error(:,i), 'color', colors{4})
 end
-if include_no_reorth
-    legend('Arnoldi NO reorth.', 'Arnoldi WITH reorth.', 'Arnoldi-based DMD', 'SVD-based DMD', 'Location', 'best', 'Interpreter', 'latex')
-else
-    legend('Arnoldi', 'Arnoldi-based DMD', 'SVD-based DMD', 'Location', 'best', 'Interpreter', 'latex')
-end
+legend('Arnoldi', 'Arnoldi-based DMD', 'SVD-based DMD', 'SVD-based DMD with truncation', 'Location', 'best', 'Interpreter', 'latex')
 if saving
     saveas(fig, "figures/Arnoldi_vs_DMD", 'epsc')
     saveas(fig, "figures/Arnoldi_vs_DMD", 'png')
