@@ -1,5 +1,6 @@
 %% PARAMETERS DEFINITION
 clear
+rng(0)
 addpath(genpath(pwd))
 saving = true;
 % Definition of the iteration function
@@ -12,7 +13,7 @@ F = @(x) gauss_map(x, alpha, beta);
 N = 40;             % Size of the dictionary
 fun_dict = @(x) legendreP(0:N-1,2*x+1).*sqrt(2*(0:N-1) + 1);
 
-M = 1000;            % Number of quadrature points
+M = 100;            % Number of quadrature points
 epsilon = 0.01;     % Tolerance for ResDMD
 
 %% QUADRATURE RULES
@@ -125,7 +126,6 @@ if saving
     saveas(fig, 'figures/gauss_map/pseudospectra_contour', 'png')
 end
 %% CONVERGENCE OF THE GALERKIN MATRIX
-
 Kfun_dot_fun = @(x) fun_dict(x)' * fun_dict(F(x));
 Galerkin_exact = integral(Kfun_dot_fun, -1, 0,'ArrayValued', true);
 %%
@@ -144,7 +144,6 @@ for index = 1:length(Ms)
         x0 = quadratures(key).x0;
         x1 = F(x0);
         w = quadratures(key).w;
-        % Computing the matrices psi_0 and psi_1
         % Computing the matrices psi_0 and psi_1
         psi_0 = psi_matrix(fun_dict, x0);
         psi_1 = psi_matrix(fun_dict, x1);
