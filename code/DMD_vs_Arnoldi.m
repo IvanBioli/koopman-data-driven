@@ -23,9 +23,12 @@ elseif strcmp(matrix, 'loss')
     d = sort(d, 'descend');
 else
     beta = 1;
-    alpha = 0.95;
-    d = [beta; alpha.^(1:n-1)'];
+    gamma = 0.99;
+    alpha = 0.9;
+    d = [beta; gamma; alpha.^(1:n-2)'];
     A = spdiags(d, 0, n, n);
+    [Q,~] = qr(randn(n)); 
+    A = Q'*A*Q;
 end
 Afun = @(x) A*x;
 x = rand(n,1); x = x/norm(x);      % Initial vector
