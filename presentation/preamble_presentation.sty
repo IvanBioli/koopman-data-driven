@@ -1,7 +1,3 @@
-%Margins
-\usepackage[top=2.5cm, bottom=3cm, left=3cm, right=3cm]{geometry}
-\pagestyle{plain}
-
 %Packages
 \usepackage[english]{babel}
 \usepackage[T1]{fontenc}
@@ -15,10 +11,8 @@
 \usepackage{bm}
 \usepackage{graphicx}
 \usepackage{subcaption}
-\usepackage{enumitem}
 \usepackage{csquotes}
 \usepackage{comment}
-\usepackage[dvipsnames]{xcolor}
 \usepackage{mathtools}
 \usepackage{centernot}
 \usepackage{float}
@@ -28,6 +22,8 @@
 %Tables
 \usepackage{tabularx}
 \usepackage{booktabs}
+\usepackage{siunitx}
+\sisetup{output-decimal-marker={.}}
 
 %Algorithms
 \usepackage{algorithm}
@@ -37,27 +33,12 @@
 \usepackage{listings}
 \usepackage[framed,numbered]{matlab-prettifier}
 
-%Chapter enumeration
-\usepackage{titlesec}
-
-\titleformat{\chapter}[display]
-  {\Huge\bfseries}
-  {}
-  {0pt}
-  {\thechapter.\ }
-
-\titleformat{name=\chapter,numberless}[display]
-  {\Huge\bfseries}
-  {}
-  {0pt}
-  {}
-
 %Hyperlinks
 \usepackage{hyperref}
 
 %Bibliography 
-\usepackage[natbib = true, sorting=nyt, style=numeric, url=false]{biblatex}
-\addbibresource{Project Koopman Operator.bib}
+\usepackage[natbib = true, url=false]{biblatex}
+\addbibresource{reduced_bibliography.bib}
 \AtEveryBibitem{%
   \clearfield{note}%
 }
@@ -68,12 +49,7 @@
 
 %Theorems
 \usepackage[noabbrev,nameinlink]{cleveref}
-
-\newtheorem{theorem}{Theorem}[chapter]
-\newtheorem{prop}[theorem]{Proposition}
-\newtheorem{corollary}{Corollary}[theorem]
-\newtheorem{lemma}[theorem]{Lemma}
-\newtheorem{definition}{Definition}[chapter]
+\newtheorem{prop}{Proposition}
 \newtheorem*{notation}{Notation}
 \theoremstyle{remark}
 \newtheorem*{remark}{Remark}
