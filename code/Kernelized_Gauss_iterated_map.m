@@ -97,11 +97,11 @@ for i = 1:length(kernels)
         x1 = F(x0);
         [lambdas_2step, ~] = EDMD(x0, x1, w, KFun);
         [lambdas_res_2step, ~] = ResDMD(x0, x1, w, KFun, epsilon);
-        plot_eigenvalues(setdiff(lambdas_2step, lambdas_res_2step), 'r.', 'MarkerSize', 10, 'DisplayName', 'KEDMD-Step 2')
+        plot_eigenvalues(setdiff(lambdas_2step, lambdas_res_2step), 'r.', 'MarkerSize', 10, 'DisplayName', 'Step 2')
         plot_eigenvalues(lambdas_res_2step, 'bx', 'MarkerSize', 10, 'DisplayName', 'KResDMD')
         axis square
         axis equal
-        legend('','', '', '', 'KEDMD-Step 1','KEDMD-Step 2','KResDMD', 'Location','bestoutside')
+        legend('','', '', '', 'KEDMD-Step 1','Step 2','KResDMD', 'Location','bestoutside')
         if saving
             saveas(fig, "figures/gauss_map/kernelized/KEDMD_2step_rbf_"+key, 'epsc')
             saveas(fig, "figures/gauss_map/kernelized/KEDMD_2step_rbf_"+key, 'png')
