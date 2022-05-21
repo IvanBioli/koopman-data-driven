@@ -17,7 +17,7 @@ M = 100;            % Number of quadrature points
 epsilon = 0.01;     % Tolerance for ResDMD
 
 %% QUADRATURE RULES
-flag = true;        % Flag for computing also for quadrature rules other than Gauss-Legendre
+flag = false;        % Flag for computing also for quadrature rules other than Gauss-Legendre
 quadratures = quadrature_nodes_weights(M, flag);
 
 %% DMD
@@ -34,7 +34,7 @@ for k = keySet
 
     [Q,lambdas] = Snapshot_DMD(psi_0, psi_1, true);
 
-    fig = figure();
+    fig = figure('visible', 'off');
     plot_eigenvalues(lambdas, 'go')
     title(key, 'FontSize', 20);
     axis square
@@ -93,30 +93,29 @@ end
 
 %% PSEUDOSPECTRUM APPROXIMATION
 disp('Starting Pseudospectrum Approximation')
-N1 = 1000; N2 = 1000;
+epsilon_vals = [0.3, 0.1, 0.01, 0.001];
+N = 1000;
 zoom_shift = 0.6;
 
 lambdas = results('Gauss-Legendre').lambdas;
 a1 = min(real(lambdas)) - zoom_shift; b1 = max(real(lambdas)) + zoom_shift;
 a2 = min(imag(lambdas)) - zoom_shift; b2 = max(imag(lambdas)) + zoom_shift;
-
-grid = complexgrid(a1, b1, N1, a2, b2, N2);
-
 x0 = quadratures('Gauss-Legendre').x0;
 w = quadratures('Gauss-Legendre').w;
 x1 = F(x0);
 
-[tau, ~] = ResDMD_pseudospectrum(x0, x1, w, fun_dict, epsilon, grid);
-
-%%
-% Plotting the eigenvalues and the pseudospectra
+opts.npts = N;
+opts.ax = [a1, b1, a2, b2];
+opts.levels = log10(epsilon_vals);
+[grid,sigs] = ResDMD_pseudospectrum_v2(x0, x1, w, fun_dict, opts); 
+%% Plotting the eigenvalues and the pseudospectra contours
 fig = figure();
 plot_eigenvalues(setdiff(results('Gauss-Legendre').lambdas, results('Gauss-Legendre').lambdas_res), 'r.')
 hold on
 plot_eigenvalues(results('Gauss-Legendre').lambdas_res, 'bx')
-epsilon_vals = [0.3, 0.1, 0.01, 0.001];
+
 for e = epsilon_vals
-    mask = tau < e;
+    mask = sigs < e;
     contour(real(grid), imag(grid), 2 * mask * e, 1, 'k', 'ShowText','on','LineWidth',1.5);
 end
 axis square

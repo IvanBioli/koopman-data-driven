@@ -1,11 +1,11 @@
 %% PARAMETERS
 clear
 addpath(genpath(pwd))
-saving = true;
+saving = false;
 
 delta_t = 0.5;          % Time step for discretization
 
-N = 20;                 % Hyperbolic cross approximation order
+N = 100;                 % Hyperbolic cross approximation order
 if N == 20
     M = 100 -1;
     L = 10;
@@ -68,7 +68,7 @@ plot_eigenvalues(setdiff(lambdas_EDMD, lambdas_ResDMD), 'm.', 'MarkerSize', 10, 
 plot_eigenvalues(lambdas_ResDMD, 'bx', 'Markersize', 10, 'DisplayName', "ResDMD")
 
 % Plotting the eigenvalues computed using DMD
-plot_eigenvalues(lambdas_DMD, '+', 'color', [0.4660 0.6740 0.1880], 'MarkerSize', 10, 'DisplayName', 'DMD')
+plot_eigenvalues(lambdas_DMD, 'go', 'MarkerSize', 10, 'DisplayName', 'DMD')
 axis square
 axis equal
 legend('Interpreter','latex','Location','bestoutside')
@@ -83,10 +83,18 @@ args = [0.4932, 0.9765, 1.4452, 1.8951];
 eigen_phase_portraits(args, psi, psi_0, psi_1, w, saving)
 
 %% ResDMD to estimate pseudospectrum
-epsilon = 0.25;
-N1 = 500; N2 = N1; a = 1.5;
-grid = complexgrid(-a, a, N1, -a, a, N2);
-[tau, ~] = ResDMD_pseudospectrum(x0, x1, w, psi, epsilon, grid, psi_0, psi_1);
+epsilon_vals = [0.25];
+grid_points=100; 
+a = 1.5;
+if N == 20
+    opts.npts = grid_points;
+    opts.ax = [-a, a, -a, a];
+    opts.levels = log10(epsilon_vals);
+    [grid,sigs] = ResDMD_pseudospectrum_v2(x0, x1, w, psi, opts, psi_0, psi_1); 
+elseif N == 100
+    grid = complexgrid(-a, a, grid_points, -a, a, grid_points);
+    [grid, sigs] = ResDMD_pseudospectrum(x0, x1, w, psi, grid, psi_0, psi_1);
+end
 %% Pseudospectrum plot
 fig = figure();
 % Drawing the unit circle
@@ -98,9 +106,8 @@ hold on
 %plot_eigenvalues(lambdas_ResDMD, 'bx')
 plot_eigenvalues(lambdas_EDMD, 'm.')
 % Drawing the estimated epsilon pseudospectrum
-epsilon_vals = [0.25];
 for e = epsilon_vals
-    mask = tau < e;
+    mask = sigs < e;
     contour(real(grid), imag(grid), 2 * mask * e, 1, 'k', 'ShowText','on','LineWidth',1.5);
 end
 axis square
@@ -109,5 +116,3 @@ if saving
     saveas(fig, "figures/pendulum/pendulum_N"+num2str(length(lambdas_EDMD)), 'epsc')
     saveas(fig, "figures/pendulum/pendulum_N"+num2str(length(lambdas_EDMD)), 'png')
 end
-
-save workspaces\pendulum_N1256.mat tau  
