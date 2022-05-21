@@ -1,4 +1,5 @@
-Throughout this work we will consider autonomous dynamical systems with finite-dimensional state space $\Omega\subseteq\R^d$ and discrete time steps according to a function $F$, i.e. dynamical systems whose evolution is characterized by the relation:
+\section{Introduction to the problem and paper structure}
+Dynamical systems are mathematical models describing the variability of a state over time, based on a fixed rule. The applications of dynamic systems are innumerable and range from classical mechanics, electrical circuits, fluid flows and thermodynamic systems to neuroscience, finance and epidemiology. Throughout this work we will consider autonomous dynamical systems with finite-dimensional state space $\Omega\subseteq\R^d$ and discrete time steps according to a function $F$, i.e. dynamical systems whose evolution is characterized by the relation:
 \begin{equation}
     \label{dynamical_system}
     \vb{x}_{n+1} = \vb{F}(\vb{x}_n)\,\,\,n\geq 0, \qquad \vb{F}:\Omega \to \Omega
@@ -13,7 +14,9 @@ then sampling the trajectories with time steps $\Delta t$ we are back to the for
     \vb{x}(t+\Delta t) = \vb{F}_{\Delta t}(\vb{x}(t)), \qquad \vb\vb{F}_{\Delta t}(\vb{x}(t)) = \vb{x}(t) + \int_{t}^{t+\Delta t}{\vb{f}(\vb{x}(\tau)) d\tau}.
 \end{equation}
 
-The classical approach to the study of dynamical systems is the geometric one, originated by the work of Poincaré \cite{henri_poincare_les_1899}. However, this geometric viewpoint, based on fixed points, local behaviours and invariant manifolds, is ill-suited to many real-world applications \cite{budisic_applied_2012}. As pointed out in \cite{colbrook_rigorous_2021}, the fundamental challenges of Poincaré's approach in a data-driven perspective are two: non-linear dynamics, for which the geometric viewpoints provides good trajectories approximations only locally and not for all initial conditions, and unknown dynamics. The latter case typically arises when the system's dynamic is too complex to describe analytically or partially unknown, and we have only access to experimental data related to sequences of iterates sampled starting from different initial conditions. Koopman Operator theory \cite{koopman_dynamical_1932, koopman_hamiltonian_1931} provides an alternative viewpoint, which is a general framework for connecting data and measurements to the state space of a dynamical system \cite{arbabi_introduction_nodate}.
+The classical approach to the study of dynamical systems is the geometric one, originated by the work of Poincaré \cite{henri_poincare_les_1899}. However, this geometric viewpoint, based on fixed points, local behaviours and invariant manifolds, is ill-suited to many real-world applications \cite{budisic_applied_2012}. As pointed out in \cite{colbrook_rigorous_2021}, the fundamental challenges of Poincaré's approach in a data-driven perspective are two: non-linear dynamics, for which the geometric viewpoints provides good trajectories approximations only locally and not for all initial conditions, and unknown dynamics. The latter case typically arises when the system's dynamic is too complex to describe analytically or partially unknown, and we have only access to experimental data related to sequences of iterates sampled starting from different initial conditions. Koopman Operator theory \cite{koopman_dynamical_1932, koopman_hamiltonian_1931} provides an alternative viewpoint, which is a general framework for connecting data and measurements to the state space of a dynamical system \cite{arbabi_introduction_2018}.
+\subsection{Paper structure}
+In this first chapter, we introduce the Koopman Operator and its spectral properties, analysing in details the case of linear dynamical systems. In \Cref{chapter_dmd} we introduce Dynamic Mode Decomposition (DMD), we link it to the Arnoldi method in the case of linear dynamical systems, and we present how it can be extended to the general case of nonlinear dynamics. In \Cref{chapter_edmd} we present Extended Dynamic Mode Decomposition (EDMD) for computing spectral properties of the Koopman Operator, discussing the spectral pollution problem and introducing the Residual Dynamic Mode Decomposition (ResDMD) algorithm for removing spectral pollution and approximating the pseudospectrum of the Koopman Operator. We also reproduce some of the numerical examples in \cite{colbrook_rigorous_2021}. Finally, in \Cref{chapter_kedmd} we present a kernel-based approach for dynamical systems with high dimensional data, analysing experimentally possible applications also to low dimensional data.
 
 \section{Definition of the Koopman Operator}
 When dealing with real-world applications, especially when the dynamics are unknown, the state of the dynamical system is indirectly measured through data, which are variables related to the system's state. We can mathematically formulate this assuming that data is evaluations of functions of the states, leading to the following definition.
@@ -168,15 +171,15 @@ and the evolution of the system reads:
 where $P_h$ is the projection onto $\Span(\vb{v}_h^1,\dots,\vb{v}_h^{m_h})$ and $D_h$ is a nilpotent operator.
 \end{prop}
 \begin{proof}
-We just need to show that $D_h$ is really a nilpotent operator. It suffices to observe that $D_h$ is defined by
+We just need to show that $D_h$ is a nilpotent operator. It suffices to observe that $D_h$ is defined by
 \begin{equation}
-    D_h(x) = D_h\left(\sum_{h = 1}^{s}\sum_{i = 1}^{m_h} \phi_h^i(\vb{x}) \vb{v}_h^i\right) = \sum_{i = 1}^{m_h-1}\phi_h^{i+1}(\vb{x})\vb{v}_h^i = \sum_{i = 2}^{m_h}\phi_h^{i}(\vb{x})\vb{v}_h^{i-1}
+    D_h(\vb{x}) = D_h\left(\sum_{h = 1}^{s}\sum_{i = 1}^{m_h} \phi_h^i(\vb{x}) \vb{v}_h^i\right) = \sum_{i = 1}^{m_h-1}\phi_h^{i+1}(\vb{x})\vb{v}_h^i = \sum_{i = 2}^{m_h}\phi_h^{i}(\vb{x})\vb{v}_h^{i-1}
 \end{equation}
 hence by induction:
 \begin{equation}
     D_h^k(\vb{x}) = \sum_{i = k+1}^{m_h}\phi_h^{i}(\vb{x})\vb{v}_h^{i-k}
 \end{equation}
-where we use the convention that the sum is equal to zero if $k+1>m_h$, i.e. if $k > m_h$.
+where we use the convention that the sum is equal to zero if $k+1>m_h$, i.e. if $k \geq m_h$.
 \end{proof}
 
 \begin{corollary}
@@ -201,14 +204,14 @@ Then $P_j$ is the projection onto the algebraic eigenspace associated with $\mu_
 and the thesis follows.
 \end{proof}
 
-Hence the action of the Koopman Operator on the full state observable can be obtained from the standard spectral analysis of $\vb*{A}$ and $\vb*{A}^*$, and the same is true for all linear observables $g(\vb*{x}) = \langle \vb{c}, \vb{x} \rangle$.
+Hence the action of the Koopman Operator on the full state observable can be obtained from the standard spectral analysis of $\vb*{A}$ and $\vb*{A}^*$, and the same is true for all linear observables $g(\vb{x}) = \langle \vb{c}, \vb{x} \rangle$.
 
 \subsection{Koopman Mode Decomposition: nonlinear systems}
 So far, the Koopman Operator theory applied to the linear case did not provide any new insight in the analysis of the dynamical systems. Let us now consider the more general non-linear case, in which the linearization introduced by the Koopman Operator (at the price of an infinite-dimensional space) can significantly help us.
 
 We are interested in understanding the evolution of observables over time. This is particularly simple if the observable can be written as a linear combination of Koopman eigenfunctions. For this reason, the following definition was introduced in \cite{rowley_spectral_2009}.
 \begin{definition}[Koopman Mode Decomposition]
-Let $g:\Omega\to\C^p$ be a vector valued observable. Let us assume that each of its component $g_i$ lies in the closure of the Span of $J$ Koopman eigenfunctions, where the case $J=+\infty$ is possible and often occurs. Then we can write 
+Let $g:\Omega\to\C^p$ be a vector valued observable. Let us assume that each of its component $g_i$ lies in the closure of the Span of $J$ Koopman eigenfunctions, where the case $J=+\infty$ is possible (and often occurs). Then we can write 
 \begin{equation*}
 	g_i = \sum_{j = 1}^J v_{ij}\phi_j, \qquad v_{ij}\in\C
 \end{equation*}

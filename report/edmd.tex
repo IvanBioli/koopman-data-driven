@@ -1,9 +1,12 @@
+\label{chapter_edmd}
+In this third chapter, we introduce Extended Dynamic Mode Decomposition as a method for approximating eigenpairs from a dictionary of observables. In \Cref{section_resdmd} we introduce the problem of spectral pollution, and we explain how Residual DMD (ResDMD) can be used to remove it. Then we present pseudospectra as an effective method to individuate spectral pollution, as well as the use of ResDMD for approximating the pseudospectrum of the Koopman Operator. Finally, in \Cref{section_experiments} we reproduce some of he numerical examples presented in \cite{colbrook_rigorous_2021}.
+
 \section{Extended Dynamic Mode Decomposition (EDMD)}
 \label{section_edmd}
 The \emph{Extended Dynamic Mode Decomposition} (EDMD), originally presented in \cite{williams_data-driven_2015}, is a method that seeks at approximating the Koopman Operator as a finite dimensional operator and then approximate the Koopman (eigenvalue, eigenfunction, mode) tuples from this finite dimensional approximation. The algorithm requires in input:
 \begin{itemize}
     \item a dataset of snapshot pairs of the system state, $\{(\vb{x}_0^{(m)}, \vb{x}_1^{(m)})\}_{m = 1}^M$ with $\vb{x}_1^{(m)} = \vb{F}(\vb{x}_0^{(m)})$;
-    \item a dictionary of observables $\mathcal{D} = \{\psi_1, \dots, \psi_K\} \subseteq \mathcal{D}(\mathcal{K})$. Let us define the vector-valued observable $\Psi:\Omega\to\C^{1\times k}$ as $\Psi(x) = [\psi_1(x), \dots, \psi_k(x)]$. The choice of the dictionary $\mathcal{D}$ is not easy and depends on the problem at hand. For the moment, let us assume that $\mathcal{D}$ is rich enough to approximate at least a few of the dominant Koopman eigenfunctions.
+    \item a dictionary of observables $\mathcal{D} = \{\psi_1, \dots, \psi_K\} \subseteq \mathcal{D}(\mathcal{K})$. Let us define the vector-valued observable $\Psi:\Omega\to\C^{1\times K}$ as $\Psi(x) = [\psi_1(x), \dots, \psi_K(x)]$. The choice of the dictionary $\mathcal{D}$ is not easy and depends on the problem at hand. For the moment, let us assume that $\mathcal{D}$ is rich enough to approximate at least a few of the dominant Koopman eigenfunctions.
 \end{itemize}
 
 \subsection{Approximation of $\mathcal{K}$ and its eigenpairs}
@@ -16,7 +19,7 @@ We aim at generating $\vb*{K}\in\C^{k\times k}$ finite dimensional approximation
     \label{k_finite_dimensional}
     \mathcal{K}\vb{\phi} = (\Psi \circ \vb{F})\vb{a} = \Psi\vb*K\vb{a} + r
 \end{equation}
-where the residual term $r = r(\vb{a}, \vb{x})$ is due to the fact that in general $\Span(\mathcal{D})$ is not $\mathcal{K}$-invariant. To obtain the "best" $\vb*{K}\in\C^{k\times k}$ it is natural to minimize the norm of the point-wise maximum of the residual of all possible $\phi\in\Span(\mathcal{D})$, i.e to solve the following problem \cite{colbrook_rigorous_2021}:
+where the residual term $r = r(\vb{a}, \vb{x})$ is due to the fact that in general $\Span(\mathcal{D})$ is not $\mathcal{K}$-invariant. To obtain the "best" $\vb*{K}\in\C^{K\times K}$ it is natural to minimize the norm of the point-wise maximum of the residual of all possible $\phi\in\Span(\mathcal{D})$, i.e to solve the following problem \cite{colbrook_rigorous_2021}:
 \begin{equation}
     \label{edmd_integral_problem}
     \argmin_{\vb*{K}\in\C^{K\times K}}\int_{\Omega} \max_{\vb{a}\in\C^k \\ \norm{\vb{a}} = 1}\abs{r(\vb{a}, \vb{x})}^2 d\omega(\vb{x}) = 
@@ -50,7 +53,7 @@ The solution of the weighted least squares problem is
     \label{discretized_problem_solution}
     (\Psi_0^*\vb*{W}\Psi_0)\vb*{K} = \Psi_0^*\vb*{W}\Psi_1 \,\,\Longrightarrow\,\, \vb*{K} = (\Psi_0^*\vb*{W}\Psi_0)^{\dagger}(\Psi_0^*\vb*{W}\Psi_1),
 \end{equation}
-where by $\Longrightarrow$ we mean that $\vb*{K}$ is the solution with minimal norm, but to have uniqueness of the solution one might use regularization techniques. If the weights are the same for all quadrature points, then $\vb{K} = (\Psi_0^*\Psi_0)^{\dagger} \Psi_0^*\Psi_1 = \Psi_0^{\dagger}\Psi_1$ and we are back to same matrix that we would obtain applying the DMD algorithm with vector-valued observable $\Psi$.
+where by $\Longrightarrow$ we mean that $\vb*{K}$ is the solution with minimal norm, but to have uniqueness of the solution one might use regularization techniques. If the weights are the same for all quadrature points, then $\vb{K} = (\Psi_0^*\Psi_0)^{\dagger} \Psi_0^*\Psi_1 = \Psi_0^{\dagger}\Psi_1$ and we are back to the transpose of the matrix that we would obtain applying the DMD algorithm with vector-valued observable $\Psi^T$.
 
 Observe that the matrices involved in the computations are
 \begin{equation*}
@@ -100,7 +103,7 @@ Let $\bm{\Xi} = \left[\bm{\xi}_1,\dots,\bm{\xi}_K\right]$ be the matrix of the e
 \begin{equation}
     \vb{g} = \vb*{B}^T\Psi^T = \vb*{B}^T(\bm{\Xi}^T)^{-1}\Phi^T = (\bm{\Xi}^{-1}\vb*{B})^T\Phi^T.
 \end{equation}
-Since $\bm{\Xi}$ is the matrix of the eigenvectors of $\vb*{K}$, its inverse is $\bm{\Xi}^{-1} = \left[\vb{u}_1, \dots, \vb{u}_K\right]$ where $\vb{u}_i$ is the left eigenvector of $\vb*{K}$ also associated with $\lambda_i$ and appropriately scaled so that $\vb{u}_i^*\bm{\xi}_j = \delta_{ij}$. We can therefore compute the left eigenvectors of and letting  $\vb*{V} = (\vb*{U}^*\vb*{B})^T$, then
+Since $\bm{\Xi}$ is the matrix of the eigenvectors of $\vb*{K}$, its inverse is $\bm{\Xi}^{-1} = \left[\vb{u}_1, \dots, \vb{u}_K\right]$ where $\vb{u}_i$ is the left eigenvector of $\vb*{K}$ also associated with $\lambda_i$ and appropriately scaled so that $\vb{u}_i^*\bm{\xi}_j = \delta_{ij}$. We can therefore compute the left eigenvectors of $\vb*{K}$ and letting  $\vb*{V} = (\vb*{U}^*\vb*{B})^T$, then
 \begin{equation}
     \vb{g} = \vb*{V}\Psi^T = \sum_{k=1}^K \vb{v}_k\psi_k,
 \end{equation}
@@ -134,6 +137,7 @@ If we are interested in an approximation of only a leading subset of eigenvalues
 
 
 \section{Spectral pollution and Residual DMD (ResDMD)}
+\label{section_resdmd}
 To compute the eigenvalues of the Koopman Operator, we approximate the infinite-dimensional operator $\mathcal{K}$ by a finite matrix. Therefore, even if some of the eigenvalues produced by the EDMD algorithm are reliable, most of them are not. \emph{Pseudospectra} \cite{trefethen_spectra_2005} are a tool that allow us to detect this so called \emph{spectral pollution} \cite{colbrook_rigorous_2021}, i.e. spurious eigenvalues of the matrix $\vb*{K}$ that are only due to the discretization and have no connection with the latent Koopman Operator.
 
 \begin{definition}[Pseudospectrum of a square matrix]
@@ -308,16 +312,17 @@ Finally one can write the upper part of the matrix as:
 \end{equation*}
 \end{proof}
 
-From the previous rewriting, one can use standard techniques for the computation of pseudospectra of rectangular matrices \cite{wright_pseudospectra_2002}, as long as $M$ is not too big. Observe indeed that the matrix pencil in \cite{prop_pseudospectrum} is of size $M\times K$, while the generalized eigenvalue problems in \Cref{alg_pseudospectrum} involve matrices of size $K\times K$.
+From the previous rewriting, one can use standard techniques for the computation of pseudospectra of rectangular matrices \cite{wright_pseudospectra_2002}, as long as $M$ is not too big. Observe indeed that the matrix pencil in \Cref{prop_pseudospectrum} is of size $M\times K$, while the generalized eigenvalue problems in \Cref{alg_pseudospectrum} involve matrices of size $K\times K$.
 
 \section{Numerical Examples}
-We try in this section to reproduce some of the numerical examples from \cite{colbrook_rigorous_2021}.
+\label{section_experiments}
+In this section we reproduce two numerical examples from Section 4 of \cite{colbrook_rigorous_2021}.
 
 \subsection{Gauss iterated map}
 \label{sect_gauss_iterated_map}
-The Gauss iterated map is a function $F:\R\to\R$ defined by $F(x) =\exp(\alpha x^2) + \beta $, where $\alpha$ and $\beta$ are parameters. We consider the case $\alpha = 2$ and $\beta = 1-\exp(-\alpha) = 1 - e^{-2}$, with state space $\Omega = [-1, 0]$ and the Lebesgue measure. Observe that with such a choice of the parameters, $F$ maps $\Omega$ onto itself, as necessary to have a well defined dynamical system on $\Omega$. As a dictionary of observable $\mathcal{D}$ we consider the first $K$ normalized Legendre polynomials transferred to the interval $\Omega$. To understand the influence on the accuracy of the algorithm of the choice of the snapshot pairs $\{(\vb{x}_0^{(m)}, \vb{x}_1^{(m)})\}_{m = 1}^M$, which are the nodes of the quadrature rule, we consider four different types of quadrature rule:
+The Gauss iterated map is a function $F:\R\to\R$ defined by $F(x) =\exp(\alpha x^2) + \beta $, where $\alpha$ and $\beta$ are parameters. We consider the case $\alpha = 2$ and $\beta = 1-\exp(-\alpha) = 1 - e^{-2}$, with state space $\Omega = [-1, 0]$ and the Lebesgue measure. Observe that with such a choice of the parameters, $F$ maps $\Omega$ onto itself, as necessary to have a well defined dynamical system on $\Omega$. As a dictionary of observable $\mathcal{D}$ we consider the first $K$ normalized Legendre polynomials transplanted to the interval $\Omega$. To understand the influence on the accuracy of the algorithm of the choice of the snapshot pairs $\{(\vb{x}_0^{(m)}, \vb{x}_1^{(m)})\}_{m = 1}^M$, which are the nodes of the quadrature rule, we consider four different types of quadrature rule:
 \begin{itemize}
-    \item Gauss-Legendre: $\{\vb{x}_0^{(m)}\}_{m = 1}^M$ are the Gauss-Legendre quadrature nodes transferred to the interval $\Omega$, with $\{w_m\}_{m = 1}^M$ the corresponding quadrature weights.
+    \item Gauss-Legendre: $\{\vb{x}_0^{(m)}\}_{m = 1}^M$ are the Gauss-Legendre quadrature nodes transplanted to the interval $\Omega$, with $\{w_m\}_{m = 1}^M$ the corresponding quadrature weights.
     \item Trapezoidal: $\vb{x}_0^{(m)} = -1 + \frac{m-1}{M-1}$, with $w_m = \frac{1}{M-1},\,\,m = 2,\dots, M-1$ and $w_1 = w_M = \frac{1}{2(M-1)}$.
     \item Riemann sum: $\vb{x}_0^{(m)} = -1 + \frac{m-1}{M-1}$, with $w_m = \frac{1}{M-1},\,\,m = 1,\dots, M$.
     \item Montecarlo: $\{\vb{x}_0^{(m)}\}_{m = 1}^M$ are chosen uniformly at random in over the interval $\Omega$, with $w_m = \frac{1}{M-1},\,\,m = 1,\dots, M$. 
@@ -376,7 +381,7 @@ Let us consider the continous-time dynamical system of the nonlinear pendulum. T
     -\sin(x_1)
     \end{bmatrix}.
 \end{equation}
-We consider the corresponding discrete-time dynamical system with time-step $\Delta_t = 0.5.$ and the associated Koopman Operator. The system is Hamiltonian and hence the Koopman Operator is unitary \cite{koopman_hamiltonian_1931}.
+We consider the corresponding discrete-time dynamical system with time-step $\Delta_t = 0.5$ and the associated Koopman Operator. The system is Hamiltonian and hence the Koopman Operator is unitary \cite{koopman_hamiltonian_1931}.
 
 The choice of the dictionary of observables is now more complex, because the function governing the motion is vector-valued (with two components) and periodic in the first component. Since the motion is periodic in $x_1\in[-\pi,\pi]_{\text{per}}$, it is natural to use the Fourier basis $\{e_n\}_{n\in\mathbb{Z}}$ in $x_1$ to describe the motion in this direction. Similarly, to approximate the motion in the direction of $x_2$ one might decide to use the Hermite functions $\{h_n\}_{n\in\mathbb{N}}$, which form a basis of the Hilbert space $L^2(\R)$. Therefore, we would ideally consider observables of the form $\phi(x_1, x_2) = \sum_{n\in\mathbb{Z},\,m\in\mathbb{N}} \alpha_{n,m} e_n(x_1)\cdot h_m(x_2)$ for some coefficients $\{\alpha_{n,m}\}\in\C$. However, our dictionary of observables must be finite and we need to decide a criterion to truncate the sum. Observe that there isn't a natural ordering as if the indices were in $\mathbb{N}$ or $\mathbb{Z}$. Since we want to be able to approximate the (components of the) full state observable, it is important to have the indices $\{(n,0)\}_{n=0}^{n_{\max}}$ and $\{(0,m)\}_{m=-m_{\max}}^{m_{\max}}$ with $n_{\max},\,m_{\max}$ as high as possible. Selecting the indices in the rectangle $\{(n,m)\,:\,-n_{\max}\leq n\leq n_{\max},\,\, 0\leq m\leq m_{\max}\}$ would make the size of the dictionary grow too fast in $n_{\max}$ and $m_{\max}$, thus we use an hyperbolic cross approximation \cite{dung_hyperbolic_2017}, i.e. we select the indices in the hyperbolic cross $\{(n,m)\,:\, \max(n,1)\cdot \max(m,1)\leq N \}$, where $N$ is called the order of the hyperbolic cross approximation.
 
@@ -385,10 +390,10 @@ Using \Cref{alg_pseudospectrum} we compute an approximation of the $\varepsilon$
 \begin{figure}[h]
 \makebox[\textwidth][c]{
     \begin{subfigure}{0.45\textwidth}
-        \includegraphics[width=\linewidth]{../code/figures/pendulum/pendulum_N193.png}
+        \includegraphics[width=\linewidth]{../code/figures/pendulum/pendulum_N193.eps}
     \end{subfigure}\hspace*{\fill}
     \begin{subfigure}{0.45\textwidth}
-        \includegraphics[width=\linewidth]{../code/figures/pendulum/pendulum_N1265.png}
+        \includegraphics[width=\linewidth]{../code/figures/pendulum/pendulum_N1265.eps}
     \end{subfigure}\hspace*{\fill}
         }
     \caption{Contour lines of the $\varepsilon$-pseudospectrum for $\varepsilon = 0.25$ computed using \Cref{alg_pseudospectrum} with hyperbolic cross approximation. On the left the approximation obtained using a dictionary of $K=193$ observables and $M = 10^4$ data points, on the right the one obtained with $K=1265$ and $M = 9 \times 10^4$.}

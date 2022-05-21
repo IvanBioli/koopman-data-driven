@@ -1,0 +1,104 @@
+\documentclass{beamer}
+\usetheme{Boadilla}
+\title[Semester Project]{Rigorous data-driven computation of spectral properties of Koopman operators for dynamical systems}
+\author[Ivan Bioli]{\emph{Author}: Ivan Bioli\\[5mm]{\emph{Professor}: Daniel Kressner \\ \emph{Supervisor}: Alice Cortinovis}}
+\institute[EPFL]{École Polytechnique Fédérale de Lausanne\\Master in Computational Sciences and Engineering}
+\date{May 30, 2022}
+\usepackage{preamble_presentation}
+
+
+\begin{document}
+\begin{frame}
+\centering
+\titlepage
+\end{frame}
+
+\begin{frame}[fragile]{The Koopman Operator}
+Autonomous dynamical systems with finite-dimensional state space and discrete time steps:
+\begin{equation}
+    \vb{x}_{n+1} = \vb{F}(\vb{x}_n)\,\,\,n\geq 0, \qquad \vb{F}:\Omega \to \Omega
+\end{equation}
+\begin{definition}[Observable]
+A function $g:\Omega\to\C$ used to indirectly measure the state of the dynamical system is called an observable. 
+\end{definition}
+\begin{definition}[Koopman Operator]
+Given a suitable domain of observables $\mathcal{D}(\mathcal{K}) \subseteq L^2(\Omega)$ we define the Koopman Operator as:
+\begin{equation}
+    \label{koopman_def}
+    \begin{split}
+       \mathcal{K} : \mathcal{D}(\mathcal{K}) &\longrightarrow L^2(\Omega, \omega)
+       \\
+       g & \longmapsto g \circ \vb{F}
+    \end{split}    
+\end{equation} 
+\end{definition}
+\end{frame}
+
+\begin{frame}[fragile]{Linear dynamical systems}
+\centering
+$\vb{F}(\vb{x}) = A\vb{x}$, $\vb{A}\in\R^{d\times d}$
+\begin{prop}
+Let us assume that $\vb{A}\in\R^{d\times d}$ is diagonalizable with a full set of eigenpairs $\{(\lambda_j, \vb{v}_j)\}_{j=1}^{d}$. Let $\{(\overline{\lambda}_j, \vb{w}_j)\}_{j=1}^{d}$ be the eigenpairs of of $\vb{A}^*$, with $\{\vb{w}_j)\}_{j=1}^{d}$ such that $\langle \vb{v}_j, \vb{w}_k\rangle = \delta_{k,j}$. Then we can rewrite $\vb{x}\in\R^d$:
+\begin{equation}
+    \label{decomposition_linear}
+    \vb{x} = \sum_{j=1}^d \langle \vb{x}, \vb{w}_j\rangle \vb{v}_j = \sum_{j=1}^d \phi_j(\vb{x}) \vb{v}_j.
+\end{equation}
+It holds $[\mathcal{K}\phi_j](\vb{x}) = \lambda_j\phi_j$ and the evolution of the system reads
+\begin{equation}
+    \label{evolution_linear}
+    \vb{F}(\vb{x}) = \vb{A}\vb{x}  = \sum_{j=1}^d \phi_j(\vb{x}) \vb{A}\vb{v}_j = \sum_{j=1}^d \lambda_j \phi_j(\vb{x}) \vb{v}_j = \sum_{j=1}^d [\mathcal{K}\phi_j](\vb{x})\vb{v}_j.
+\end{equation}
+\end{prop}
+\end{frame}
+
+\begin{frame}[fragile]{Nonlinear dynamical systems}
+\begin{definition}[Koopman Mode Decomposition]
+$g:\Omega\to\C^p$ a vector valued observable s.t. each of its component $g_i$ lies in the closure of the Span of $J$ Koopman eigenfunctions, where the case $J=+\infty$ is possible (and often occurs). Then we can write $\displaystyle{g_i = \sum_{j = 1}^J v_{ij}\phi_j, \, v_{ij}\in\C}$ and staking the weights into the vectors 
+%$\vb{v}_j = [v_{1j},\dots,v_{pj}]^T\in\C^p$ 
+\begin{equation}
+    \label{koopman_modes}
+	g(\vb{x}) = \sum_{j = 1}^J \phi_j(\vb{x})\vb{v}_{j}.
+\end{equation}
+\end{definition}
+\begin{itemize}
+    \item $\vb{F}(\vb{x}) = [\mathcal{K}g](\vb{x}) = \sum_{j = 1}^J [\mathcal{K}\phi_j](\vb{x})\vb{v}_j = \sum_{j = 1}^J \lambda_j\phi_j(\vb{x})\vb{v}_j$
+    \item $g(\vb{x}_n) = [\mathcal{K}^ng](\vb{x}_0) = \sum_{j = 1}^J \lambda_j^n\phi_j(\vb{x}_0)\vb{v}_{j}$ 
+    \item Idea: link the two formulations via the full state observable $g(x) = x$
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Dynamic Mode Decomposition (DMD)}
+Linear dynamical system: $x_{n+1} = Ax_n$. Access to a sequence of snapshots:
+\begin{equation*}
+    \vb{V}_1^N = \left[\vb{v}_1, \vb{v}_2, \dots, \vb{v}_N\right] = \left[\vb{v}_1, \vb{A}\vb{v}_1, \dots, \vb{A}^N\vb{v}_1\right]
+\end{equation*}
+\alert{\textbf{Idea:}} write $\vb{v}_N = a_1 \vb{v}_1 + \dots + a_{N-1} \vb{v}_{N-1} + \vb{r}$ and minimize the residual.
+\begin{block}{DMD (Arnoldi-based version)}
+\begin{equation*}
+    \vb{A}\vb{V}_1^{N-1}  = \vb{V}_1^{N-1}\vb{S} + \vb{r}\vb{e}_{N-1}^T, \quad 
+    \vb{S} :=
+   \begin{bmatrix}
+   0     &        &       &      & a_1 \\
+   1     & 0      &       &      & a_2 \\
+         & \ddots & \ddots&      & \vdots \\ 
+         &        & 1     & 0    & a_{N-2} \\
+         &        &       & 1    & a_{N-1} \\
+   \end{bmatrix}.
+\end{equation*}
+To minimize the norm of the residual $\vb{V}_1^{N-1} = \vb{Q}\vb{R}$ and:
+\begin{equation*}
+    \vb{a} = \vb{R}^{-1} \vb{Q}^*\vb{v}_N = (\vb{V}_1^{N-1})^{\dagger}\vb{v}_N.
+\end{equation*}
+\end{block}
+\end{frame}
+
+\begin{frame}{DMD and the Arnoldi method}
+    
+\end{frame}
+
+\begin{frame}{Main references}
+\nocite{*}
+\printbibliography
+\end{frame}
+
+\end{document}

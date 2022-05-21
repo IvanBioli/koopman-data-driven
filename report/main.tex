@@ -11,7 +11,7 @@
     [0.7 cm]
     \textsc{\LARGE Master in Computational Sciences and Engineering}\\
     \vspace{\fill}
-    \textbf{\textsc{\fontsize{50}{50}\selectfont Draft Report}}\\ \vspace{\fill}		
+    \Huge\textbf{\textsc{Rigorous data-driven computation of spectral properties of Koopman operators for dynamical systems}}\\ \vspace{\fill}		
 	\textsc{\LARGE Semester Project}\\[0.4cm]
 	\rule{\linewidth}{0.2 mm} \\[0.5 cm]
 	\begin{minipage}{0.4\textwidth}
@@ -29,7 +29,7 @@
     Alice \textsc{Cortinovis} \\
     \end{flushright}
     \end{minipage}\\
-	[2cm] \Large{\today}
+	[2cm] \Large{June 10, 2022}
 	
 \end{titlepage}
 \restoregeometry
@@ -59,8 +59,11 @@ TO DO
 \chapter{A kernel-based approach for high dimensional data}
 \input{kedmd}
 
+\chapter{Conclusions}
+Starting from the article \cite{colbrook_rigorous_2021} by Colbrook and Townsend, we analysed spectral properties of the Koopman Operator and discussed methods to numerically compute spectral approximations. Dynamic Mode Decomposition was presented, with a particular focus on the case of linear dynamical systems, where DMD is mathematically equivalent to the Arnoldi algorithm but less stable from a numerical point of view. For nonlinear dynamics, the EDMD algorithm was proposed, and its variant ResDMD was used both to deal with the problem of spectral pollution and to approximate the pseudospectrum of the Koopman Operator. Furthermore, a proposition linking the pseudospectral approximation returned by ResDMD and the pseudospectrum of a particular matrix pencil was proven in this work. Two numerical examples from Section 4 of \cite{colbrook_rigorous_2021} were reproduced in details: the Gauss iterated map and the nonlinear pendulum. Finally, the kernelized approach proposed in \cite{colbrook_rigorous_2021} for high dimensional data, was used to create a data-driven dictionary for the Gauss iterated map problem, in order to show a possible way of avoiding the step of hand-crafting a problem-dependent dictionary for the EDMD and ResDMD algorithms.
+
 %BIBLIOGRAPHY
-%\nocite{*}
+\nocite{*}
 \printbibliography
 
 \end{document}
