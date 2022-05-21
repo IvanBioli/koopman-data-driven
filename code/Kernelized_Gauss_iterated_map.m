@@ -55,14 +55,14 @@ for k = keySet
 end
 
 %% EDMD and KEDMD: RBF kernel and polynomial kernel
-epsilon = 0.1;     % Tolerance for ResDMD
+epsilon = 0.01;     % Tolerance for ResDMD
 M = 1000;
 quadratures = quadrature_nodes_weights(M, true);
 keySet = {'Montecarlo'};
 K_dominants = 40;
 
 % Kernels
-gamma = mean((quadratures('Montecarlo').x0-mean(quadratures('Montecarlo').x0)).^2);
+gamma = 1./mean((quadratures('Montecarlo').x0-mean(quadratures('Montecarlo').x0)).^2)^2;
 kernels = {@(x, y) exp(-gamma*(x-y)^2)};
 
 for i = 1:length(kernels)
@@ -87,8 +87,8 @@ for i = 1:length(kernels)
             hold on
         end
         axis square
-        [lambdas_1step, KFun] = KEDMD(x0, x1, w, kernel, K_dominants);
-        plot_eigenvalues(lambdas_1step, 'g.', 'MarkerSize', 10, 'DisplayName', 'KEDMD-1Step')
+        [lambdas_1step, KFun] = KEDMD(x0, x1, w, kernel, K_dominants,G,A,eta);
+        plot_eigenvalues(lambdas_1step, 'g.', 'MarkerSize', 10, 'DisplayName', 'KEDMD-Step 1')
         hold on
         %KResDMD
         quadratures = quadrature_nodes_weights(M, true);
@@ -97,10 +97,11 @@ for i = 1:length(kernels)
         x1 = F(x0);
         [lambdas_2step, ~] = EDMD(x0, x1, w, KFun);
         [lambdas_res_2step, ~] = ResDMD(x0, x1, w, KFun, epsilon);
-        plot_eigenvalues(setdiff(lambdas_2step, lambdas_res_2step), 'r.', 'MarkerSize', 10, 'DisplayName', 'KEDMD-2Step')
+        plot_eigenvalues(setdiff(lambdas_2step, lambdas_res_2step), 'r.', 'MarkerSize', 10, 'DisplayName', 'KEDMD-Step 2')
         plot_eigenvalues(lambdas_res_2step, 'bx', 'MarkerSize', 10, 'DisplayName', 'KResDMD')
         axis square
         axis equal
+        legend('','', '', '', 'KEDMD-Step 1','KEDMD-Step 2','KResDMD', 'Location','bestoutside')
         if saving
             saveas(fig, "figures/gauss_map/kernelized/KEDMD_2step_rbf_"+key, 'epsc')
             saveas(fig, "figures/gauss_map/kernelized/KEDMD_2step_rbf_"+key, 'png')
