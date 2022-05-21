@@ -27,8 +27,8 @@ We cannot directly compute the integral, thus we need to use a quadrature rule. 
 \begin{equation}
 \label{edmd_discretized_problem}
 \begin{split}
-    &\argmin_{\vb*{K}\in\C^{k\times k}} \sum_{j=1}^M w_j \norm{\Psi(\vb{F}(\vb{x}_0^{(j)})) - \Psi(\vb{x}_0^{(j)})\vb*{K}}^2 d\omega(\vb{x}) = \\
-    = &\argmin_{\vb*{K}\in\C^{k\times k}} \sum_{j=1}^M w_j \norm{\Psi(\vb{x}_1^{(j)}) - \Psi(\vb{x}_0^{(j)})\vb*{K}}^2 d\omega(\vb{x}).
+    &\argmin_{\vb*{K}\in\C^{k\times k}} \sum_{j=1}^M w_j \norm{\Psi(\vb{F}(\vb{x}_0^{(j)})) - \Psi(\vb{x}_0^{(j)})\vb*{K}}^2 = \\
+    = &\argmin_{\vb*{K}\in\C^{k\times k}} \sum_{j=1}^M w_j \norm{\Psi(\vb{x}_1^{(j)}) - \Psi(\vb{x}_0^{(j)})\vb*{K}}^2.
 \end{split}    
 \end{equation}
 If we define the matrices
@@ -48,11 +48,11 @@ we can write the weighted least-square problem in \eqref{edmd_discretized_proble
 Since this is a convex problem in $\vb*{K}$, it suffices to impose that the derivative (of the real and of the imaginary part) is zero, from which we get
 \begin{equation}
     \label{discretized_problem_solution}
-    (\Psi_0^*\vb*{W}\Psi_0)\vb*{K} = \Psi_0^*\vb*{W}\Psi_1 \,\,\Longrightarrow\,\, \vb*{K} = (\Psi_0^*\vb*{W}\Psi_0)^{\dagger}(\Psi_0^*\vb*{W}\Psi_1).
+    (\Psi_0^*\vb*{W}\Psi_0)\vb*{K} = \Psi_0^*\vb*{W}\Psi_1 \,\,\Longrightarrow\,\, \vb*{K} = (\Psi_0^*\vb*{W}\Psi_0)^{\dagger}(\Psi_0^*\vb*{W}\Psi_1),
 \end{equation}
-If the weights are the same for all quadrature points, then from the properties of the Moore-Penrose inverse $\vb{K} = \Psi_0^{\dagger} \Psi_1$ and we are back to same matrix that we would obtain applying the DMD algorithm with vector-valued observable $\Psi$.
+where by $\Longrightarrow$ we mean that $\vb*{K}$ is the solution with minimal norm, but to have uniqueness of the solution one might use regularization techniques. If the weights are the same for all quadrature points, then $\vb{K} = (\Psi_0^*\Psi_0)^{\dagger} \Psi_0^*\Psi_1 = \Psi_0^{\dagger}\Psi_1$ and we are back to same matrix that we would obtain applying the DMD algorithm with vector-valued observable $\Psi$.
 
-Observe that the involved matrice are
+Observe that the matrices involved in the computations are
 \begin{equation*}
     \label{psi_rewriting}
     \begin{split}
@@ -134,17 +134,36 @@ If we are interested in an approximation of only a leading subset of eigenvalues
 
 
 \section{Spectral pollution and Residual DMD (ResDMD)}
-To compute the eigenvalues of the Koopman Operator, we approximate the infinite-dimensional operator $\mathcal{K}$ by a finite matrix. Therefore, even if some of the eigenvalues produced by the EDMD algorithm are reliable, most of them are not. \emph{Pseudospectra} \cite{trefethen_spectra_2005} are a tool that allow us to detect this so called \emph{spectral pollution} \cite{colbrook_rigorous_2021}, i.e. spurious eigenvalues of the matrix $\vb*{K}$ that are only due to the discretization and have no connection with the latent Koopman Operator. Given a matrix $\vb*{A}\in\C^{n\times n}$ and $\varepsilon > 0$, the $\varepsilon$-pseudospectrum o $\vb*{A}$ is defined as
+To compute the eigenvalues of the Koopman Operator, we approximate the infinite-dimensional operator $\mathcal{K}$ by a finite matrix. Therefore, even if some of the eigenvalues produced by the EDMD algorithm are reliable, most of them are not. \emph{Pseudospectra} \cite{trefethen_spectra_2005} are a tool that allow us to detect this so called \emph{spectral pollution} \cite{colbrook_rigorous_2021}, i.e. spurious eigenvalues of the matrix $\vb*{K}$ that are only due to the discretization and have no connection with the latent Koopman Operator.
+
+\begin{definition}[Pseudospectrum of a square matrix]
+Given a matrix $\vb*{A}\in\C^{n\times n}$ and $\varepsilon > 0$, the $\varepsilon$-pseudospectrum of $\vb*{A}$ is defined as
 \begin{equation}
     \label{pseudospectrum_matrix_def}
-    \sigma_{\varepsilon}(\vb*{A}) = \left\{ \lambda\in\C \text{ : } \norm{(\vb*{A} - \lambda \vb*{I})^{-1}} > \frac{1}{\varepsilon}\right\} = \bigcup_{\norm{\vb*{B}} \leq \varepsilon} \sigma(\vb*{A}+ \vb*{B}),
+    \sigma_{\varepsilon}(\vb*{A}) = \left\{ \lambda\in\C \text{ : } \norm{(\vb*{A} - \lambda \vb*{I})^{-1}}_2 \geq \frac{1}{\varepsilon}\right\} = \left\{ \lambda\in\C \text{ : } \sigma_{\mathrm{min}}(\vb*{A} - \lambda \vb*{I}) \leq \varepsilon \right\} %\bigcup_{\norm{\vb*{B}} \leq \varepsilon} \sigma(\vb*{A}+ \vb*{B}),
 \end{equation}
-where $\sigma(\vb*{M})$ indicates the spectrum of the matrix $\vb*{M}$. However, $\mathcal{K}$ is an infinite dimensional operator and might be undounded, hence following \cite{trefethen_spectra_2005} we can define
+where $\sigma_{\mathrm{min}}(\vb*{M})$ indicates the minimum singular value of the matrix $\vb*{M}$.
+\end{definition}
+In analogy with the second form of previous definition, we can define the pseudospectrum of a rectangular matrix pencil as follows.
+\begin{definition}[Pseudospectrum of a rectangular matrix pencil]
+Given two rectangular matrices $\vb*{A},\vb*{B} \in\C^{m\times n}$ and $\varepsilon > 0$, the $\varepsilon$-pseudospectrum of the matrix pencil $\vb*{A}- \lambda \vb*{B}$ is defined as
+\begin{equation}
+    \label{pseudospectrum_matrix_pencil_def}
+    \sigma_{\varepsilon}(\vb*{A}, \vb*{B}) = \left\{ \lambda\in\C \text{ : } \sigma_{\mathrm{min}}(\vb*{A} - \lambda \vb*{B}) \leq \varepsilon \right\} %\bigcup_{\norm{\vb*{B}} \leq \varepsilon} \sigma(\vb*{A}+ \vb*{B}),
+\end{equation}
+The pseudospectrum of a rectangular matrix $\vb*{A}\in\C^{m\times n}$ is defined as $    \sigma_{\varepsilon}(\vb*{A}, \vb*{I})$ where
+\begin{equation}
+    \vb*{I} = \begin{bmatrix} \vb*{I}_n \\ \vb*{0}_{m-n,n}\end{bmatrix} \text{ if $n<m$}, \qquad \vb*{I} = \begin{bmatrix} \vb*{I}_m & \vb*{0}_{m,n-m}\end{bmatrix} \text{ if $m<n$}.
+\end{equation}
+\end{definition}
+However, $\mathcal{K}$ is an infinite dimensional operator and might be unbounded, hence following \cite{colbrook_rigorous_2021} we can define
 \begin{equation}
     \label{pseudospectrum_koopman_def}
-    \sigma_{\varepsilon}(\mathcal{K}) = \mathrm{cl}\left( \left\{ \lambda\in\C \text{ : } \norm{(\mathcal{K} - \lambda \cdot \mathrm{id})^{-1}} > \frac{1}{\varepsilon}\right\} \right) = \mathrm{cl}\left( \bigcup_{\norm{\vb*{B}} \leq \varepsilon} \sigma(\mathcal{K}+ \vb*{B}) \right)
+    \sigma_{\varepsilon}(\mathcal{K}) = \mathrm{cl}\left( \left\{ \lambda\in\C \text{ : } \norm{(\mathcal{K} - \lambda \cdot \mathrm{id})^{-1}} \geq \frac{1}{\varepsilon}\right\} \right) = \mathrm{cl}\left( \bigcup_{\norm{\vb*{B}} \leq \varepsilon} \sigma(\mathcal{K}+ \vb*{B}) \right)
 \end{equation}
 where $\mathrm{id}$ is the identity operator and $\mathrm{cl}$ is the closure of a set.
+
+
 
 \subsection{ResDMD to remove spectral pollution}
 The \emph{Residual DMD} (ResDMD) algorithm performs the same steps of EDMD, but then discards the approximate eigenpairs $\{(\lambda_j,\, \phi_j)\}_j$ that have a residual above a certain prescribed tolerance $\varepsilon$. Given a candidate eigenpair $(\lambda, \phi)$ of $\mathcal{K}$, where $\phi = \Psi\bm{\xi}$, to measure its accuracy we can consider the relative residual
@@ -183,7 +202,19 @@ If $\widetilde{\mathrm{res}}(\lambda, \phi) > \varepsilon$, the eigenpair $(\lam
 \textbf{Output:} Approximation of the eigenvalues ($\lambda_j$), eigenfunctions ($\phi_j$) with $\widetilde{\mathrm{res}}(\lambda_j, \phi)_j < \varepsilon$
 \end{algorithm}
 
-The above-described cleanup procedure avoids spectral pollution and if the quadrature converges, in the large data limit, removes eigenpairs with a residual above the prescribed tolerance $\varepsilon$ and retains only eigenpairs that are inside the $\varepsilon$-pseudospectrum of $\mathcal{K}$ \cite{colbrook_rigorous_2021}.
+The above-described cleanup procedure avoids spectral pollution and if the quadrature converges, in the large data limit, removes eigenpairs with a residual above the prescribed tolerance $\varepsilon$ and retains only eigenpairs that are inside the $\varepsilon$-pseudospectrum of $\mathcal{K}$. This is precised in the following proposition.
+\begin{prop}[\cite{colbrook_rigorous_2021}, Theorem 4.1]
+Assume that the quadrature rule converges, i.e. that
+\begin{equation*}
+    \lim_{M\to+\infty}(\Psi_0^*\vb*{W}\Psi_0)_{jk} = \langle \psi_j, \psi_k \rangle, \quad
+    \lim_{M\to+\infty}(\Psi_0^*\vb*{W}\Psi_1)_{jk} = \langle \psi_j, \mathcal{K}\psi_k \rangle, \quad
+    \lim_{M\to+\infty}(\Psi_1^*\vb*{W}\Psi_1)_{jk} = \langle \mathcal{K}\psi_j, \mathcal{K}\psi_k \rangle.
+\end{equation*}
+Let us denote by $\Lambda$ the eigenvalues in the output of \Cref{alg_resdmd}, then
+\begin{equation}
+    \limsup_{M\to+\infty} \max_{\lambda\in\Lambda}\norm{(\mathcal{K} - \lambda)^{-1}}^{-1} \leq \epsilon.
+\end{equation}
+\end{prop}
 
 \subsection{ResDMD to approximate the pseudospectrum}
 In spite of the fact that the eigenvalues returned by \Cref{alg_resdmd} lie in the $\varepsilon$-pseudospectrum (in the large data limit), the eigenvalues of $\vb*{K}$ might not approximate the whole spectrum of $\mathcal{K}$ and therefore it might not be possible to approximate the whole $\varepsilon$-pseudospectrum of $\mathcal{K}$ using \Cref{alg_resdmd}. A simple modification of \Cref{alg_resdmd} allows us to draw an approximation of the $\varepsilon$-pseudospectrum of $\mathcal{K}$ starting from a grid of points in the complex plane. Given a point $z_j\in\C$ on a grid, we search the function $\psi_j$ in $\Span(\mathcal{D})$ that minimizes $\mathrm{res}(z_j, \phi)$, i.e. we solve
@@ -192,15 +223,18 @@ In spite of the fact that the eigenvalues returned by \Cref{alg_resdmd} lie in t
     \tau_j = \min_{\vb{g}\in\C^K} \mathrm{res}(z_j, \Psi\vb{g}), \qquad \vb{g}_j = \argmin_{\vb{g}\in\C^K} \mathrm{res}(z_j, \Psi\vb{g}).
 \end{equation}
 Following \eqref{residual_approx}, the discretized problem reads:
-\begin{align}
+\begin{equation}
     \label{grid_discretized}
-    \tau_j = \min_{\vb{g}\in\C^K} \frac{\vb{g}^*\vb*{D}(z_j)\vb{g}}{\vb{g}^*(\Psi_0^*\vb*{W}\Psi_0)\vb{g}}\,\,, \qquad \vb{g}_j = \argmin_{\vb{g}\in\C^K} \frac{\vb{g}^*\vb*{D}(z_j)\vb{g}}{\vb{g}^*(\Psi_0^*\vb*{W}\Psi_0)\vb{g}} \\
+    \tau_j = \min_{\vb{g}\in\C^K} \frac{\vb{g}^*\vb*{D}(z_j)\vb{g}}{\vb{g}^*(\Psi_0^*\vb*{W}\Psi_0)\vb{g}}\,\,, \qquad \vb{g}_j = \argmin_{\vb{g}\in\C^K} \frac{\vb{g}^*\vb*{D}(z_j)\vb{g}}{\vb{g}^*(\Psi_0^*\vb*{W}\Psi_0)\vb{g}}
+\end{equation}
+\begin{equation}
     \label{D(z)_definition}
-    \vb*{D}(z_j) = (\Psi_1^*\vb*{W}\Psi_1) - z_j (\Psi_1^*\vb*{W}\Psi_0) - \overline{z}_j(\Psi_0^*\vb*{W}\Psi_1) + \abs{z_j}^2 (\Psi_0^*\vb*{W}\Psi_0).
-\end{align}
-The matrices $(\Psi_0^*\vb*{W}\Psi_0)$ and $\vb*{D}(z_j)$ are hermitian positive semidefinite, thus from the properties of the Rayleigh quotient solving \eqref{grid_discretized} is equivalent to finding the smallest eigenvalue and the associated eigenvector of the generalized eigenvalue problem $\vb*{D}(z_j)\vb{g} = \tau(\Psi_0^*\vb*{W}\Psi_0)\vb{g}$, which allows for an efficient computation.
-
-The algorithm is summarized in \Cref{alg_pseudospectrum} Convergence guarantees for the approximation of the $\varepsilon$-pseudospectrum can be found in \cite{colbrook_rigorous_2021}.
+    \begin{split}
+        \vb*{D}(z_j) &= (\Psi_1^*\vb*{W}\Psi_1) - z_j (\Psi_1^*\vb*{W}\Psi_0) - \overline{z}_j(\Psi_0^*\vb*{W}\Psi_1) + \abs{z_j}^2 (\Psi_0^*\vb*{W}\Psi_0) =\\ 
+        & = (\Psi_1 - z_j\Psi_0)^*\vb*{W}(\Psi_1 - z_j\Psi_0).
+    \end{split}
+\end{equation}
+The matrices $(\Psi_0^*\vb*{W}\Psi_0)$ and $\vb*{D}(z_j)$ are hermitian positive semidefinite. If we also assume that $\Psi_0$ has full column rank, from the properties of the Rayleigh quotient solving \eqref{grid_discretized} is equivalent to finding the smallest eigenvalue and the associated eigenvector of the generalized eigenvalue problem $\vb*{D}(z_j)\vb{g} = \tau(\Psi_0^*\vb*{W}\Psi_0)\vb{g}$, which allows for a more efficient computation. This algorithm, proposed in \cite{colbrook_rigorous_2021}, is summarized in \Cref{alg_pseudospectrum}. Convergence guarantees for the approximation of the $\varepsilon$-pseudospectrum can be found in \cite{colbrook_rigorous_2021}.
 
 \begin{algorithm}
 \caption{\textbf{: ResDMD for pseudospectrum approximation}}
@@ -216,11 +250,71 @@ The algorithm is summarized in \Cref{alg_pseudospectrum} Convergence guarantees 
 \textbf{Output:} Estimate of the $\varepsilon$-pseudospectrum $\{z_j\,:\,\tau_j < \varepsilon\}$ and corresponding approximate eigenfunctions $\{\vb{g}_j\,:\,\tau_j < \varepsilon\}$. 
 \end{algorithm}
 
+The following proposition allows to rewrite the pseudospectrum approximation provided by \Cref{alg_pseudospectrum} as the pseudospectrum either of a rectangular matrix pencil or of a rectangular matrix.
+\begin{prop}
+\label{prop_pseudospectrum}
+Let us assume that $\Psi_0$ has full column rank and let us consider the singular value decomposition $\sqrt{\vb*{W}}\Psi_0 = \vb*{U}\bm{\Sigma}\vb*{V}$, where $\vb*{U}\in\C^{M\times K}$ and $\bm{\Sigma},\vb*{V}\in\C^{K\times K}$. Then the approximation of the pseudospectrum of the Koopman operator provided by \Cref{alg_pseudospectrum} coincides with the pseudospectrum of the rectangular matrix pencil
+\begin{equation}
+    \sqrt{\vb*{W}}\Psi_1 \vb*{V}\bm{\Sigma}^{-1} - \lambda\vb*{U}.
+\end{equation}
+Moreover if the columns of $\vb*{U}_{\perp}$ complete the columns of $\vb*{U}$ to an orthonormal basis of $\C^{M}$, then the pseudospectrum approximation coincides also with the pseudospectrum of the rectangular matrix
+\begin{equation}
+    \begin{bmatrix}
+    \vb*{U}^*\sqrt{\vb*{W}}\Psi_1 \vb*{V}\bm{\Sigma}^{-1}\\
+    \vb*{U}_{\perp}^*\sqrt{\vb*{W}}\Psi_1 \vb*{V}\bm{\Sigma}^{-1}
+    \end{bmatrix} = 
+    \begin{bmatrix}
+    \bm{\Sigma}\vb{V}^*(\Psi_0^\dagger \Psi_1)\vb{V}\bm{\Sigma}^{-1}\\
+    \vb*{U}_{\perp}^*\sqrt{\vb*{W}}\Psi_1 \vb*{V}\bm{\Sigma}^{-1}
+    \end{bmatrix}.
+\end{equation}
+\end{prop}
+\begin{proof}
+Let $z\in\C$ and let us consider the corresponding residual:
+\begin{equation*}
+\begin{split}
+    \tau(z) &= \min_{\vb{g}\in\C^K} \frac{\vb{g}^*\vb*{D}(z)\vb{g}}{\vb{g}^*(\Psi_0^*\vb*{W}\Psi_0)\vb{g}} = \min_{\vb{g}\in\C^K} \frac{\vb{g}^*\vb*{D}(z)\vb{g}}{\vb{g}^*(\vb*{V}\bm{\Sigma}\vb*{V}^*)^2\vb{g}} =  \min_{\vb{v}\in\C^K} \frac{\vb{v}^*(\vb*{V}\bm{\Sigma}^{-1}\vb*{V}^*)\vb*{D}(z)(\vb*{V}\bm{\Sigma}^{-1}\vb*{V}^*)\vb{v}}{\vb{v}^*\vb{v}} = \\
+    &= \lambda_{\min}\left((\vb*{V}\bm{\Sigma}^{-1}\vb*{V}^*)\vb*{D}(z)(\vb*{V}\bm{\Sigma}^{-1}\vb*{V}^*)\right) = \lambda_{\min}\left(\vb*{C}(z)^*\vb*{C}(z)\right) = \sigma_{\min}(\vb*{C}(z))^2
+\end{split}
+\end{equation*}
+where from \eqref{D(z)_definition} we can write $\vb*{C}(z) = \sqrt{\vb*{W}}(\Psi_1 - z\Psi_0)\vb*{V}\bm{\Sigma}^{-1}\vb*{V}^*$. Hence $\tau(z) = \sigma_{\min}(\vb*{C}(z))^2 \leq \varepsilon^2$ if and only if $\sigma_{\min}(\vb*{C}(z)) \leq \varepsilon$. Now observe that
+\begin{equation*}
+    \begin{split}
+        \sigma_{\min}(\vb*{C}(z)) &= \sigma_{\min}(\sqrt{\vb*{W}}(\Psi_1 - z\Psi_0)\vb*{V}\bm{\Sigma}^{-1}\vb*{V}^*) = \sigma_{\min}(\sqrt{\vb*{W}}(\Psi_1 - z\vb*{U}\bm{\Sigma}\vb*{V}^*)\vb*{V}\bm{\Sigma}^{-1}\vb*{V}^*) = \\
+        &= \sigma_{\min}(\sqrt{\vb*{W}}(\Psi_1 - z\vb*{U}\bm{\Sigma}\vb*{V}^*)\vb*{V}\bm{\Sigma}^{-1}) = \sigma_{\min}(\sqrt{\vb*{W}}\Psi_1\vb*{V}\bm{\Sigma}^{-1} - z\vb*{U})
+    \end{split}
+\end{equation*}
+from which follows the first statement. 
+
+Moreover $\vb*{Q} = [\vb*{U}\,\lvert\,\vb*{U}_\perp]$ is an unitary matrix, hence multiplying by $Q$ on the left the singular values are preserved, yielding:
+\begin{equation*}
+    \begin{split}
+        \sigma_{\min}(\vb*{C}(z)) &= \sigma_{\min}(\vb*{Q}^*\sqrt{\vb*{W}}\Psi_1\vb*{V}\bm{\Sigma}^{-1} - z\vb*{Q}^*\vb*{U}) = \\
+        & = \sigma_{\min}\left( 
+        \begin{bmatrix}
+        \vb*{U}^*\sqrt{\vb*{W}}\Psi_1 \vb*{V}\bm{\Sigma}^{-1}\\
+        \vb*{U}_{\perp}^*\sqrt{\vb*{W}}\Psi_1 \vb*{V}\bm{\Sigma}^{-1}
+        \end{bmatrix} - z 
+        \begin{bmatrix}
+        \vb*{I}_K\\
+        \vb*{0}_{M-K, K}\\
+        \end{bmatrix}
+        \right).
+    \end{split}
+\end{equation*}
+Finally one can write the upper part of the matrix as:
+\begin{equation*}
+    \vb*{U}^*\sqrt{\vb*{W}}\Psi_1 \vb*{V}\bm{\Sigma}^{-1} = \bm{\Sigma} \vb*{V}^* \vb*{V}\bm{\Sigma}^{-1}\vb*{U}^*\sqrt{\vb*{W}}\Psi_1 \vb*{V}\bm{\Sigma}^{-1} = \bm{\Sigma}\vb{V}^*(\Psi_0^\dagger \Psi_1)\vb{V}\bm{\Sigma}^{-1}.
+\end{equation*}
+\end{proof}
+
+From the previous rewriting, one can use standard techniques for the computation of pseudospectra of rectangular matrices \cite{wright_pseudospectra_2002}, as long as $M$ is not too big. Observe indeed that the matrix pencil in \cite{prop_pseudospectrum} is of size $M\times K$, while the generalized eigenvalue problems in \Cref{alg_pseudospectrum} involve matrices of size $K\times K$.
+
 \section{Numerical Examples}
-We try in this section to reproduce some of the numerical examples in \cite{colbrook_rigorous_2021}.
+We try in this section to reproduce some of the numerical examples from \cite{colbrook_rigorous_2021}.
 
 \subsection{Gauss iterated map}
-The Gauss iterated map is a function $F:\R\to\R$ defined by $F(x) =\exp(\alpha x^2) + \beta $, where $\alpha$ and $\beta$ are parameters. We consider the case $\alpha = 2$ and $\beta = 1-\exp(-\alpha) = 1 - e^{-2}$, with state space $\Omega = [-1, 0]$ and the Lebesgue measure. Observe that with such a choice of the parameters, $F$ maps $\Omega$ onto itself, as necessary to have a well defined dynamical system. As a dictionary of observable $\mathcal{D}$ we consider the first $K$ normalized Legendre polynomials transferred to the interval $\Omega$. To understand the influence on the accuracy of the algorithm of the choice of the snapshot pairs $\{(\vb{x}_0^{(m)}, \vb{x}_1^{(m)})\}_{m = 1}^M$, which are the nodes of the quadrature rule, we consider four different types of quadrature rule:
+The Gauss iterated map is a function $F:\R\to\R$ defined by $F(x) =\exp(\alpha x^2) + \beta $, where $\alpha$ and $\beta$ are parameters. We consider the case $\alpha = 2$ and $\beta = 1-\exp(-\alpha) = 1 - e^{-2}$, with state space $\Omega = [-1, 0]$ and the Lebesgue measure. Observe that with such a choice of the parameters, $F$ maps $\Omega$ onto itself, as necessary to have a well defined dynamical system on $\Omega$. As a dictionary of observable $\mathcal{D}$ we consider the first $K$ normalized Legendre polynomials transferred to the interval $\Omega$. To understand the influence on the accuracy of the algorithm of the choice of the snapshot pairs $\{(\vb{x}_0^{(m)}, \vb{x}_1^{(m)})\}_{m = 1}^M$, which are the nodes of the quadrature rule, we consider four different types of quadrature rule:
 \begin{itemize}
     \item Gauss-Legendre: $\{\vb{x}_0^{(m)}\}_{m = 1}^M$ are the Gauss-Legendre quadrature nodes transferred to the interval $\Omega$, with $\{w_m\}_{m = 1}^M$ the corresponding quadrature weights.
     \item Trapezoidal: $\vb{x}_0^{(m)} = -1 + \frac{m-1}{M-1}$, with $w_m = \frac{1}{M-1},\,\,m = 2,\dots, M-1$ and $w_1 = w_M = \frac{1}{2(M-1)}$.
@@ -232,7 +326,7 @@ The Gauss iterated map is a function $F:\R\to\R$ defined by $F(x) =\exp(\alpha x
 
 It can be seen that for the Montecarlo and the Riemann Sums quadrature rules, which use the same weights for all quadrature points, EDMD and DMD compute the same eigenvalues (magenta dots and green pluses overlap in \Cref{fig_resdmd_quadrature_comparison}). The outputs of the two algorithms are slightly dissimilar for the Trapezoidal rule, which changes the weights only at the extremes, while they significantly differ for the Gauss-Legendre rule.
 
-The convergence rates are in agreement with standard theoretical results on numerical integration \cite{quarteroni_numerical_2007}, with the Gauss-Legendre quadrature converging exponentially and the other quadrature rules polynomially. It can be understood that if one has the possibility of choosing the initial condition of the snapshot data, selecting them wisely can make the discretized problem significantly closer to the continuous one. This has a strong impact also on the accuracy of the eigenvalues computed using \Cref{alg_resdmd}. Indeed, the more accurate is the integral computation, the more eigenvalues can be removed due to a too high residual, as shown in \Cref{fig_resdmd_quadrature_comparison}.
+The convergence rates are in agreement with standard theoretical results on numerical integration \cite{quarteroni_numerical_2007}, with the Gauss-Legendre quadrature converging exponentially and the other quadrature rules polynomially. It can be understood that if one has the possibility of choosing the initial condition of the snapshot data, selecting them wisely can make the discretized problem significantly closer to the continuous one. This has a strong impact also on the accuracy of the eigenvalues computed using \Cref{alg_resdmd}. Indeed, the more accurate is the computation of the residual's integral, the more eigenvalues can be removed due to a too high residual, as shown in \Cref{fig_resdmd_quadrature_comparison}.
 
 \begin{figure}[h]
 \centering
@@ -246,7 +340,7 @@ The convergence rates are in agreement with standard theoretical results on nume
     \includegraphics[width=0.25\linewidth]{../code/figures/gauss_map/ResDMD_Gauss-Legendre.eps}
     \hspace*{\fill}
 }
-\caption{Approximations of the eigenvalues of the Koopman Operator associated with the Gauss iterated map computed with the DMD algorithm (green circles) and the EDMD algorithm (magenta dots and blue crosses), using different quadrature rules. The approximate eigenvalues are computed using $K=40$ observables and the blue crosses indicate the eigenvalues retained by ResDMD, with tolerance $\varepsilon = 0.01$.}
+\caption{Approximations of the eigenvalues of the Koopman Operator associated with the Gauss iterated map computed with the DMD algorithm (green circles) and the EDMD algorithm (magenta dots and blue crosses), using different quadrature rules. The approximate eigenvalues are computed using $K=40$ observables and $M = 100$ quadrature points. The blue crosses indicate the eigenvalues retained by ResDMD, with tolerance $\varepsilon = 0.01$.}
 \label{fig_resdmd_quadrature_comparison}
 \end{figure}
 
