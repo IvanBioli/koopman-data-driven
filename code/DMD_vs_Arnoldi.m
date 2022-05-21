@@ -82,7 +82,7 @@ for i = 1:k_plot
     semilogy(its, DMD_error(:,i), 'color', colors{2})
     semilogy(its, DMD_SVD_error(:,i), 'color', colors{3})
 end
-legend('Arnoldi', 'Arnoldi-based DMD', 'SVD-based DMD', 'Location', 'best', 'Interpreter', 'latex')
+legend('Arnoldi', 'Arnoldi-based DMD', 'SVD-based DMD', 'Location', 'northeast', 'Interpreter', 'latex', 'Fontsize', 11)
 if saving
     saveas(fig, "figures/Arnoldi_vs_DMD", 'epsc')
     saveas(fig, "figures/Arnoldi_vs_DMD", 'png')
