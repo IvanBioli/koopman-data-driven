@@ -4,3 +4,6 @@ report/main.pdf
 
 
 *.asv
+*.asv
+code/eigtool/
+*.asv
