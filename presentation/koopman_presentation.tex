@@ -111,7 +111,7 @@ Suppose that $\vb{V}_1^{N-1}$ is of full column rank. Then the Arnoldi method an
 \alert{\textbf{Idea:}} approximate the Koopman Operator as a finite dimensional operator and then approximate the Koopman (eigenvalue, eigenfunction, mode) tuples from this finite dimensional approximation. 
 
 \medskip
-\textbf{Input}:
+\structure{\textbf{Input}}:
 \begin{itemize}
     \item Snapshot pairs of the system state: $\{(\vb{x}_0^{(m)}, \vb{x}_1^{(m)})\}_{m = 1}^M$ with $\vb{x}_1^{(m)} = \vb{F}(\vb{x}_0^{(m)})$;
     \item a dictionary of observables $\mathcal{D} = \{\psi_1, \dots, \psi_K\} \subseteq \mathcal{D}(\mathcal{K})$.
@@ -134,33 +134,57 @@ We consider:
 \end{frame}
 
 \begin{frame}{Spectral pollution and Residual DMD (ResDMD)}
-\alert{Problem:} Spurious eigenvalues only due to the discretization of $\mathcal{K}$.
+\alert{\textbf{Problem:}} Spurious eigenvalues only due to the discretization of $\mathcal{K}$.
 
 \medskip
-\textbf{ResDMD}: For each candidate eigenpair $(\lambda, \phi)$ of $\mathcal{K}$, approximate using the datapoints as quadrature nodes the residual:
+\only<1->{
+\structure{\textbf{ResDMD}}: For each candidate eigenpair $(\lambda, \phi)$ of $\mathcal{K}$, approximate using the datapoints as quadrature nodes the residual:
 \begin{equation*}
     \mathrm{res}(\lambda, \phi)^2 = \frac{\int_{\Omega} \abs{[\mathcal{K}\phi](x) - \lambda\phi(x)}^2\,\,d\omega(x)}{\int_{\Omega} \abs{\phi(x)}^2\,\,d\omega(x)} 
         = \frac{\langle (\mathcal{K} - \lambda \cdot\mathrm{id})\phi, (\mathcal{K} - \lambda \cdot \mathrm{id})\phi \rangle}{\langle\phi , \phi \rangle}
 \end{equation*}
-and discard if the residual is above a given tolerance $\varepsilon$.
+and discard if the residual is above a given tolerance $\varepsilon$.}
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.55\linewidth]{../code/figures/gauss_map/presentation_EDMD.eps}
+    \only<1>{\includegraphics[width=0.53\linewidth]{../code/figures/gauss_map/presentation_edmd.eps}}
+    \only<2>{\includegraphics[width=0.53\linewidth]{../code/figures/gauss_map/presentation_resdmd.eps}}
 \end{figure}
 \end{frame}
 
 \begin{frame}{ResDMD to approximate the pseudospectrum}
+\only<1>{
 \begin{definition}[Pseudospectrum]
 \begin{itemize}
     \item Square matrices: $\displaystyle{\sigma_{\varepsilon}(\vb{A}) = \left\{ \lambda\in\C \text{ : } \norm{(\vb{A} - \lambda \vb{I})^{-1}}_2 \geq \frac{1}{\varepsilon}\right\}}$
-    \item Rectangular pencils: $\displaystyle{\sigma_{\varepsilon}(\vb{A}, \vb{B}) = \left\{ \lambda\in\C \text{ : } \sigma_{\mathrm{min}}(\vb{A} - \lambda \vb{B}) \leq \varepsilon \right\}}$
+    %\item Rectangular pencils: $\displaystyle{\sigma_{\varepsilon}(\vb{A}, \vb{B}) = \left\{ \lambda\in\C \text{ : } \sigma_{\mathrm{min}}(\vb{A} - \lambda \vb{B}) \leq \varepsilon \right\}}$
     \item Koopman Operator: $\displaystyle{\sigma_{\varepsilon}(\mathcal{K}) = \mathrm{cl}\left( \left\{ \lambda\in\C \text{ : } \norm{(\mathcal{K} - \lambda \cdot \mathrm{id})^{-1}} \geq \frac{1}{\varepsilon}\right\} \right)}$
 \end{itemize}
 \end{definition}
+
+\structure{\textbf{ResDMD for pseudospectrum approximation:}} For each $\lambda$ on a grid, compute the function $\phi\in\Span(\mathcal{D})$ that minimizes (an approximation of) $\mathrm{res}(\lambda, \phi)$ and keep $\lambda$ if $\mathrm{res}(\lambda, \phi)<\varepsilon$.
+\begin{prop}[\cite{colbrook_rigorous_2021}, Theorem 4.1]
+Assuming that the quadrature rule converges, then for each $\lambda$ in output to ResDMD it holds: 
+\begin{equation*}
+    \limsup_{M\to+\infty} \max_{\lambda\in\Lambda}\norm{(\mathcal{K} - \lambda\cdot \mathrm{id})^{-1}}^{-1} \leq \epsilon.
+\end{equation*}
+\end{prop}}
+\only<2>{
+\begin{figure}[h]
+    \begin{center}
+        \includegraphics[width=0.55\linewidth]{../code/figures/gauss_map/pseudospectra_contour.eps}
+    \end{center}
+    \caption{Gauss iterated map problem. Contour lines of the $\varepsilon$-pseudospectrum for $\varepsilon = 0.3,\,0.1,\,0.01,\,0.001$ computed using ResDMD with dictionary of $K=40$ observables.}
+\end{figure}
+}
 \end{frame}
 
 \begin{frame}{Kernelized EDMD (K-EDMD)}
-    
+\alert{\textbf{Limitation of EDMD (and ResDMD):}} Need to find a suitable dictionary for each problem.
+
+\medskip
+\structure{\textbf{Possible solution:}} Start from a general purpose kernel, such as RBF, and use a two-steps extraction procedure.
+
+
 \end{frame}
 \begin{frame}{Main references}
 \nocite{*}
