@@ -110,7 +110,7 @@ opts.levels = log10(epsilon_vals);
 [grid,sigs] = ResDMD_pseudospectrum_v2(x0, x1, w, fun_dict, opts); 
 %% Plotting the eigenvalues and the pseudospectra contours
 fig = figure();
-plot_eigenvalues(setdiff(results('Gauss-Legendre').lambdas, results('Gauss-Legendre').lambdas_res), 'r.')
+plot_eigenvalues(setdiff(results('Gauss-Legendre').lambdas, results('Gauss-Legendre').lambdas_res), 'm.')
 hold on
 plot_eigenvalues(results('Gauss-Legendre').lambdas_res, 'bx')
 
