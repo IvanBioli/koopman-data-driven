@@ -184,7 +184,18 @@ Assuming that the quadrature rule converges, then for each $\lambda$ in output t
 \medskip
 \structure{\textbf{Possible solution:}} Start from a general purpose kernel, such as RBF, and use a two-steps extraction procedure.
 
-
+\begin{figure}[h]
+\makebox[\textwidth][c]{
+    \begin{subfigure}{0.45\textwidth}
+        \includegraphics[width=\linewidth]{../code/figures/gauss_map/pseudospectra_contour.eps}
+        \caption{ResDMD starting from a hand-crafted dictionary (the first $K = 40$) Legendre polynomials.}
+    \end{subfigure}\hspace*{\fill}
+    \begin{subfigure}{0.45\textwidth}
+        \includegraphics[width=\linewidth]{../code/figures/gauss_map/kernelized/KEDMD_2step_rbf_Montecarlo.eps}
+        \caption{Kernelized ResDMD starting from the RBF kernel.}
+        \label{gauss_convergence}
+    \end{subfigure}\hspace*{\fill}}
+\end{figure}
 \end{frame}
 \begin{frame}{Main references}
 \nocite{*}
