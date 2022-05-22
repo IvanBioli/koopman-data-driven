@@ -15,22 +15,22 @@
 
 \begin{frame}[fragile]{The Koopman Operator}
 Autonomous dynamical systems with finite-dimensional state space and discrete time steps:
-\begin{equation}
+\begin{equation*}
     \vb{x}_{n+1} = \vb{F}(\vb{x}_n)\,\,\,n\geq 0, \qquad \vb{F}:\Omega \to \Omega
-\end{equation}
+\end{equation*}
 \begin{definition}[Observable]
 A function $g:\Omega\to\C$ used to indirectly measure the state of the dynamical system is called an observable. 
 \end{definition}
 \begin{definition}[Koopman Operator]
 Given a suitable domain of observables $\mathcal{D}(\mathcal{K}) \subseteq L^2(\Omega)$ we define the Koopman Operator as:
-\begin{equation}
+\begin{equation*}
     \label{koopman_def}
     \begin{split}
        \mathcal{K} : \mathcal{D}(\mathcal{K}) &\longrightarrow L^2(\Omega, \omega)
        \\
        g & \longmapsto g \circ \vb{F}
     \end{split}    
-\end{equation} 
+\end{equation*} 
 \end{definition}
 \end{frame}
 
@@ -39,15 +39,15 @@ Given a suitable domain of observables $\mathcal{D}(\mathcal{K}) \subseteq L^2(\
 $\vb{F}(\vb{x}) = A\vb{x}$, $\vb{A}\in\R^{d\times d}$
 \begin{prop}
 Let us assume that $\vb{A}\in\R^{d\times d}$ is diagonalizable with a full set of eigenpairs $\{(\lambda_j, \vb{v}_j)\}_{j=1}^{d}$. Let $\{(\overline{\lambda}_j, \vb{w}_j)\}_{j=1}^{d}$ be the eigenpairs of of $\vb{A}^*$, with $\{\vb{w}_j)\}_{j=1}^{d}$ such that $\langle \vb{v}_j, \vb{w}_k\rangle = \delta_{k,j}$. Then we can rewrite $\vb{x}\in\R^d$:
-\begin{equation}
+\begin{equation*}
     \label{decomposition_linear}
     \vb{x} = \sum_{j=1}^d \langle \vb{x}, \vb{w}_j\rangle \vb{v}_j = \sum_{j=1}^d \phi_j(\vb{x}) \vb{v}_j.
-\end{equation}
+\end{equation*}
 It holds $[\mathcal{K}\phi_j](\vb{x}) = \lambda_j\phi_j$ and the evolution of the system reads
-\begin{equation}
+\begin{equation*}
     \label{evolution_linear}
     \vb{F}(\vb{x}) = \vb{A}\vb{x}  = \sum_{j=1}^d \phi_j(\vb{x}) \vb{A}\vb{v}_j = \sum_{j=1}^d \lambda_j \phi_j(\vb{x}) \vb{v}_j = \sum_{j=1}^d [\mathcal{K}\phi_j](\vb{x})\vb{v}_j.
-\end{equation}
+\end{equation*}
 \end{prop}
 \end{frame}
 
@@ -55,10 +55,10 @@ It holds $[\mathcal{K}\phi_j](\vb{x}) = \lambda_j\phi_j$ and the evolution of th
 \begin{definition}[Koopman Mode Decomposition]
 $g:\Omega\to\C^p$ a vector valued observable s.t. each of its component $g_i$ lies in the closure of the Span of $J$ Koopman eigenfunctions, where the case $J=+\infty$ is possible (and often occurs). Then we can write $\displaystyle{g_i = \sum_{j = 1}^J v_{ij}\phi_j, \, v_{ij}\in\C}$ and staking the weights into the vectors 
 %$\vb{v}_j = [v_{1j},\dots,v_{pj}]^T\in\C^p$ 
-\begin{equation}
+\begin{equation*}
     \label{koopman_modes}
 	g(\vb{x}) = \sum_{j = 1}^J \phi_j(\vb{x})\vb{v}_{j}.
-\end{equation}
+\end{equation*}
 \end{definition}
 \begin{itemize}
     \item $\vb{F}(\vb{x}) = [\mathcal{K}g](\vb{x}) = \sum_{j = 1}^J [\mathcal{K}\phi_j](\vb{x})\vb{v}_j = \sum_{j = 1}^J \lambda_j\phi_j(\vb{x})\vb{v}_j$
@@ -119,9 +119,9 @@ Suppose that $\vb{V}_1^{N-1}$ is of full column rank. Then the Arnoldi method an
 \end{frame}
 
 \begin{frame}{A 1D example: the Gauss iterated map}
-\begin{equation}
+\begin{equation*}
     F:\Omega = [-1, 0] \to\Omega, \qquad F(x) =\exp(\alpha x^2) + \beta 
-\end{equation}
+\end{equation*}
 We consider:
 \begin{itemize}
     \item $\{\vb{x}_0^{(m)}\}_{m = 1}^M$: Gauss-Legendre quadrature nodes, $M = 100$.
@@ -129,16 +129,34 @@ We consider:
 \end{itemize}
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.5\linewidth]{../code/figures/gauss_map/presentation.eps}
+    \includegraphics[width=0.55\linewidth]{../code/figures/gauss_map/presentation.eps}
 \end{figure}
 \end{frame}
 
-\begin{frame}{Spectral pollution and pseudospectra}
-    
+\begin{frame}{Spectral pollution and Residual DMD (ResDMD)}
+\alert{Problem:} Spurious eigenvalues only due to the discretization of $\mathcal{K}$.
+
+\medskip
+\textbf{ResDMD}: For each candidate eigenpair $(\lambda, \phi)$ of $\mathcal{K}$, approximate using the datapoints as quadrature nodes the residual:
+\begin{equation*}
+    \mathrm{res}(\lambda, \phi)^2 = \frac{\int_{\Omega} \abs{[\mathcal{K}\phi](x) - \lambda\phi(x)}^2\,\,d\omega(x)}{\int_{\Omega} \abs{\phi(x)}^2\,\,d\omega(x)} 
+        = \frac{\langle (\mathcal{K} - \lambda \cdot\mathrm{id})\phi, (\mathcal{K} - \lambda \cdot \mathrm{id})\phi \rangle}{\langle\phi , \phi \rangle}
+\end{equation*}
+and discard if the residual is above a given tolerance $\varepsilon$.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.55\linewidth]{../code/figures/gauss_map/presentation_EDMD.eps}
+\end{figure}
 \end{frame}
 
-\begin{frame}{Residual DMD (ResDMD)}
-    
+\begin{frame}{ResDMD to approximate the pseudospectrum}
+\begin{definition}[Pseudospectrum]
+\begin{itemize}
+    \item Square matrices: $\displaystyle{\sigma_{\varepsilon}(\vb{A}) = \left\{ \lambda\in\C \text{ : } \norm{(\vb{A} - \lambda \vb{I})^{-1}}_2 \geq \frac{1}{\varepsilon}\right\}}$
+    \item Rectangular pencils: $\displaystyle{\sigma_{\varepsilon}(\vb{A}, \vb{B}) = \left\{ \lambda\in\C \text{ : } \sigma_{\mathrm{min}}(\vb{A} - \lambda \vb{B}) \leq \varepsilon \right\}}$
+    \item Koopman Operator: $\displaystyle{\sigma_{\varepsilon}(\mathcal{K}) = \mathrm{cl}\left( \left\{ \lambda\in\C \text{ : } \norm{(\mathcal{K} - \lambda \cdot \mathrm{id})^{-1}} \geq \frac{1}{\varepsilon}\right\} \right)}$
+\end{itemize}
+\end{definition}
 \end{frame}
 
 \begin{frame}{Kernelized EDMD (K-EDMD)}
