@@ -5,7 +5,7 @@
 \institute[EPFL]{École Polytechnique Fédérale de Lausanne\\Master in Computational Sciences and Engineering}
 \date{May 30, 2022}
 \usepackage{preamble_presentation}
-
+\setbeamertemplate{caption}{\insertcaption}
 
 \begin{document}
 \begin{frame}
@@ -93,9 +93,57 @@ To minimize the norm of the residual $\vb{V}_1^{N-1} = \vb{Q}\vb{R}$ and:
 \end{frame}
 
 \begin{frame}{DMD and the Arnoldi method}
+\begin{prop}
+Suppose that $\vb{V}_1^{N-1}$ is of full column rank. Then the Arnoldi method and the DMD algorithms are equivalent in exact arithmetic, i.e. the Ritz pairs returned by the two algorithms coincide. 
+\end{prop}
+\alert{\textbf{But:}} the Arnoldi method is more stable as does not compute the iterates explicitly. A SVD-based version of the DMD algorithm improves numerical stability (and is equivalent in exact arithmetic).
+\begin{figure}[h]
+    \begin{columns}
+        \column{.45\linewidth}
+        \includegraphics[width=\linewidth]{../code/figures/Arnoldi_vs_DMD.eps}
+        \column{.5\linewidth}
+        \caption{Convergence of the five dominant eigenvalues using a matrix \texttt{A} of size \texttt{n = 400} defined as:\\ \texttt{A = diag([1, 0.9, 0.8.\^{}(1:n-2)])}.}
+      \end{columns}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Extended Dynamic Mode Decomposition (EDMD)}
+\alert{\textbf{Idea:}} approximate the Koopman Operator as a finite dimensional operator and then approximate the Koopman (eigenvalue, eigenfunction, mode) tuples from this finite dimensional approximation. 
+
+\medskip
+\textbf{Input}:
+\begin{itemize}
+    \item Snapshot pairs of the system state: $\{(\vb{x}_0^{(m)}, \vb{x}_1^{(m)})\}_{m = 1}^M$ with $\vb{x}_1^{(m)} = \vb{F}(\vb{x}_0^{(m)})$;
+    \item a dictionary of observables $\mathcal{D} = \{\psi_1, \dots, \psi_K\} \subseteq \mathcal{D}(\mathcal{K})$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{A 1D example: the Gauss iterated map}
+\begin{equation}
+    F:\Omega = [-1, 0] \to\Omega, \qquad F(x) =\exp(\alpha x^2) + \beta 
+\end{equation}
+We consider:
+\begin{itemize}
+    \item $\{\vb{x}_0^{(m)}\}_{m = 1}^M$: Gauss-Legendre quadrature nodes, $M = 100$.
+    \item Dictionary of observable $\mathcal{D}$: first $K = 40$ normalized Legendre polynomials, transplanted to $\Omega$.
+\end{itemize}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\linewidth]{../code/figures/gauss_map/presentation.eps}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Spectral pollution and pseudospectra}
     
 \end{frame}
 
+\begin{frame}{Residual DMD (ResDMD)}
+    
+\end{frame}
+
+\begin{frame}{Kernelized EDMD (K-EDMD)}
+    
+\end{frame}
 \begin{frame}{Main references}
 \nocite{*}
 \printbibliography
