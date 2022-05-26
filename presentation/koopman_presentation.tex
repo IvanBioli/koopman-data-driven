@@ -1,6 +1,7 @@
 \documentclass{beamer}
 \usetheme{Boadilla}
 \title[Semester Project]{Rigorous data-driven computation of spectral properties of Koopman operators for dynamical systems}
+\subtitle{Test}
 \author[Ivan Bioli]{\emph{Author}: Ivan Bioli\\[5mm]{\emph{Professor}: Daniel Kressner \\ \emph{Supervisor}: Alice Cortinovis}}
 \institute[EPFL]{École Polytechnique Fédérale de Lausanne\\Master in Computational Sciences and Engineering}
 \date{May 30, 2022}
@@ -116,6 +117,32 @@ Suppose that $\vb{V}_1^{N-1}$ is of full column rank. Then the Arnoldi method an
     \item Snapshot pairs of the system state: $\{(\vb{x}_0^{(m)}, \vb{x}_1^{(m)})\}_{m = 1}^M$ with $\vb{x}_1^{(m)} = \vb{F}(\vb{x}_0^{(m)})$;
     \item a dictionary of observables $\mathcal{D} = \{\psi_1, \dots, \psi_K\} \subseteq \mathcal{D}(\mathcal{K})$.
 \end{itemize}
+\begin{columns}[T] % align columns
+\begin{column}{.48\textwidth}
+{\usebeamercolor[fg]{structure}\textbf{DMD}\\\vspace{-6pt}\rule{\linewidth}{3pt}}
+{\footnotesize
+\begin{equation*}
+    \begin{split}
+        \Psi_0 &= \left[\Psi(\vb{x}_0^{(1)}), \dots, \Psi(\vb{x}_0^{(M)})\right]\\
+        \Psi_1 &= \left[\Psi(\vb{x}_1^{(1)}), \dots, \Psi(\vb{x}_1^{(M)})\right] = \\
+        & = \left[[\mathcal{K}\Psi](\vb{x}_0^{(1)}), \dots, [\mathcal{K}\Psi](\vb{x}_0^{(M)})\right] \\
+        K &= \Psi_1\Psi_0^{\dagger}
+    \end{split}
+\end{equation*}}
+\end{column}%
+\hfill%
+\begin{column}{.48\textwidth}
+{\usebeamercolor[fg]{structure}\textbf{EDMD}\\\vspace{-6pt}\rule{\linewidth}{3pt}}
+{\footnotesize
+\begin{equation*}
+    \begin{split}
+        &\phi = \sum_{k=1}^K a_k\psi_k = \Psi^T\vb{a}, \quad \vb{a}\in\C^K \\
+        &\mathcal{K}\vb{\phi} = (\Psi^T \circ \vb{F})\vb{a} = \Psi^T\vb*K\vb{a} + r\\
+        &\min_{\vb*{K}\in\C^{K\times K}}\int_{\Omega} \max_{\vb{a}\in\C^k,\,\norm{\vb{a}} = 1}\abs{r(\vb{a}, \vb{x})}^2 d\omega(\vb{x})
+    \end{split}
+\end{equation*}}
+\end{column}%
+\end{columns}
 \end{frame}
 
 \begin{frame}{A 1D example: the Gauss iterated map}
@@ -147,7 +174,7 @@ and discard if the residual is above a given tolerance $\varepsilon$.}
 \begin{figure}[h]
     \centering
     \only<1>{\includegraphics[width=0.53\linewidth]{../code/figures/gauss_map/presentation_edmd.eps}}
-    \only<2>{\includegraphics[width=0.53\linewidth]{../code/figures/gauss_map/presentation_resdmd.eps}}
+    \only<2>{\includegraphics[width=0.55\linewidth]{../code/figures/gauss_map/presentation_resdmd.eps}}
 \end{figure}
 \end{frame}
 
@@ -157,7 +184,7 @@ and discard if the residual is above a given tolerance $\varepsilon$.}
 \begin{itemize}
     \item Square matrices: $\displaystyle{\sigma_{\varepsilon}(\vb{A}) = \left\{ \lambda\in\C \text{ : } \norm{(\vb{A} - \lambda \vb{I})^{-1}}_2 \geq \frac{1}{\varepsilon}\right\}}$
     %\item Rectangular pencils: $\displaystyle{\sigma_{\varepsilon}(\vb{A}, \vb{B}) = \left\{ \lambda\in\C \text{ : } \sigma_{\mathrm{min}}(\vb{A} - \lambda \vb{B}) \leq \varepsilon \right\}}$
-    \item Koopman Operator: $\displaystyle{\sigma_{\varepsilon}(\mathcal{K}) = \mathrm{cl}\left( \left\{ \lambda\in\C \text{ : } \norm{(\mathcal{K} - \lambda \cdot \mathrm{id})^{-1}} \geq \frac{1}{\varepsilon}\right\} \right)}$
+    \item Koopman Operator: $\displaystyle{\sigma_{\varepsilon}(\mathcal{K}) = \mathrm{cl}\left( \left\{ \lambda\in\C \text{ : } \norm{(\mathcal{K} - \lambda \cdot \mathrm{id})^{-1}} > \frac{1}{\varepsilon}\right\} \right)}$
 \end{itemize}
 \end{definition}
 
@@ -183,18 +210,11 @@ Assuming that the quadrature rule converges, then for each $\lambda$ in output t
 
 \medskip
 \structure{\textbf{Possible solution:}} Start from a general purpose kernel, such as RBF, and use a two-steps extraction procedure.
-
 \begin{figure}[h]
-\makebox[\textwidth][c]{
-    \begin{subfigure}{0.45\textwidth}
-        \includegraphics[width=\linewidth]{../code/figures/gauss_map/pseudospectra_contour.eps}
-        \caption{ResDMD starting from a hand-crafted dictionary (the first $K = 40$) Legendre polynomials.}
-    \end{subfigure}\hspace*{\fill}
-    \begin{subfigure}{0.45\textwidth}
-        \includegraphics[width=\linewidth]{../code/figures/gauss_map/kernelized/KEDMD_2step_rbf_Montecarlo.eps}
-        \caption{Kernelized ResDMD starting from the RBF kernel.}
-        \label{gauss_convergence}
-    \end{subfigure}\hspace*{\fill}}
+    \begin{center}
+        \includegraphics[width=0.50\linewidth]{../code/figures/gauss_map/kernelized/presentation.eps}
+    \end{center}
+    \caption{Output of Kernelized ResDMD starting from the RBF kernel and Montecarlo quadrature nodes. Pseudospectral countour lines obtained with standard ResDMD are plotted as a reference.}
 \end{figure}
 \end{frame}
 \begin{frame}{Main references}
