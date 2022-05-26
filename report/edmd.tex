@@ -163,7 +163,7 @@ The pseudospectrum of a rectangular matrix $\vb*{A}\in\C^{m\times n}$ is defined
 However, $\mathcal{K}$ is an infinite dimensional operator and might be unbounded, hence following \cite{colbrook_rigorous_2021} we can define
 \begin{equation}
     \label{pseudospectrum_koopman_def}
-    \sigma_{\varepsilon}(\mathcal{K}) = \mathrm{cl}\left( \left\{ \lambda\in\C \text{ : } \norm{(\mathcal{K} - \lambda \cdot \mathrm{id})^{-1}} \geq \frac{1}{\varepsilon}\right\} \right) = \mathrm{cl}\left( \bigcup_{\norm{\vb*{B}} \leq \varepsilon} \sigma(\mathcal{K}+ \vb*{B}) \right)
+    \sigma_{\varepsilon}(\mathcal{K}) = \mathrm{cl}\left( \left\{ \lambda\in\C \text{ : } \norm{(\mathcal{K} - \lambda \cdot \mathrm{id})^{-1}} > \frac{1}{\varepsilon}\right\} \right) = \mathrm{cl}\left( \bigcup_{\norm{\vb*{B}} < \varepsilon} \sigma(\mathcal{K}+ \vb*{B}) \right)
 \end{equation}
 where $\mathrm{id}$ is the identity operator and $\mathrm{cl}$ is the closure of a set.
 
