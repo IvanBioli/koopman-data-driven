@@ -1,7 +1,7 @@
 \documentclass{beamer}
 \usetheme{Boadilla}
 \title[Semester Project]{Rigorous data-driven computation of spectral properties of Koopman operators for dynamical systems}
-\subtitle{Test}
+\subtitle{Based on an article by Matthew J. Colbrook and Alex Townsend \cite{colbrook_rigorous_2021}}
 \author[Ivan Bioli]{\emph{Author}: Ivan Bioli\\[5mm]{\emph{Professor}: Daniel Kressner \\ \emph{Supervisor}: Alice Cortinovis}}
 \institute[EPFL]{École Polytechnique Fédérale de Lausanne\\Master in Computational Sciences and Engineering}
 \date{May 30, 2022}
@@ -172,9 +172,14 @@ We consider:
 \end{equation*}
 and discard if the residual is above a given tolerance $\varepsilon$.}
 \begin{figure}[h]
+\begin{subfigure}{.49\linewidth}
     \centering
-    \only<1>{\includegraphics[width=0.53\linewidth]{../code/figures/gauss_map/presentation_edmd.eps}}
-    \only<2>{\includegraphics[width=0.55\linewidth]{../code/figures/gauss_map/presentation_resdmd.eps}}
+    \includegraphics[width=\linewidth]{../code/figures/gauss_map/presentation_edmd.eps}
+  \end{subfigure}\hfill
+  \uncover<2>{
+  \begin{subfigure}{.49\linewidth}
+    \includegraphics[width=\linewidth]{../code/figures/gauss_map/presentation_resdmd.eps}
+  \end{subfigure}}\\
 \end{figure}
 \end{frame}
 
