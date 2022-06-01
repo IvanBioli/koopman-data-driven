@@ -1,5 +1,5 @@
 %% PARAMETERS DEFINITION
-clear
+clearvars -except loading
 rng(0);
 addpath(genpath(pwd))
 saving = true;

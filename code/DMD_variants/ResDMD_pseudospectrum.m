@@ -1,7 +1,8 @@
 function [tau, mask] = ResDMD_pseudospectrum(x0, x1, w, fun_dict, epsilon, grid, psi_0, psi_1)
 %ResDMD_pseudospectrum Summary of this function goes here
 %   Detailed explanation goes here
-
+f = waitbar(0,'1','Name','Approximating pseudospectrum...',...
+    'CreateCancelBtn','setappdata(gcbf,''canceling'',1)');
 if nargin < 7
     % Computing the matrices psi_0 and psi_1
     psi_0 = psi_matrix(fun_dict, x0);
@@ -16,9 +17,8 @@ C = psi_1' * (w .*psi_1); C = (C+C')/2;
 [N1, N2] = size(grid);
 tau = zeros(N1, N2);
 for i = 1:N1
-    toc
-    tic
-    disp(i)
+    % Update waitbar and message
+    waitbar(i/N1,f,sprintf('Line %d of %d',i, N1))
     for j = 1:N2
         lambda = grid(i,j);
         D = C - lambda * B' - conj(lambda) * B + abs(lambda)^2 * A;

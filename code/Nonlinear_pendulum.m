@@ -1,11 +1,10 @@
 %% PARAMETERS
-clear
+clearvars -except loading N
 addpath(genpath(pwd))
 saving = false;
 
 delta_t = 0.5;          % Time step for discretization
 
-N = 100;                 % Hyperbolic cross approximation order
 if N == 20
     M = 100 -1;
     L = 10;
@@ -17,6 +16,8 @@ end
 %% TRAPEZOIDAL QUADRATURE NODES DEFINITION
 % Plotting the Hermite functions to understand where to truncate the
 % trapezoidal quadrature rule in x2 (which is applied in [-L, L])
+% REMOVED because it is not part of the plots in the report
+%{
 n_points = 1000;
 x = linspace(-L,L,n_points);
 deg = 0:N;
@@ -26,7 +27,7 @@ for i = deg
     plot(x, y(:,i+1));
     hold on
 end
-
+%}
 % Creating the quadrature grid and the corresponding weights
 % For x1 we consider the interval [-pi,pi] since the Fourier basis is
 % periodic with period 2*pi
@@ -51,49 +52,28 @@ psi_1 = psi_matrix(psi, x1);
 %% EDMD for eigenpairs computation
 [lambdas_EDMD, KFun_EDMD] = EDMD(x0, x1, w, psi, psi_0, psi_1);
 
-%% Comparison of DMD, EDMD and ResDMD
-epsilon = 0.25;
-[lambdas_ResDMD, KFun_ResDMD] = ResDMD(x0, x1, w, psi, epsilon, psi_0, psi_1);
-[Q,lambdas_DMD] = Snapshot_DMD(psi_0, psi_1);
-
-%% Plots
-fig = figure();
-% Drawing the unit circle
-theta = linspace(0, 2*pi, 1000);
-plot(exp(1i*theta), '-r', 'DisplayName', 'Unit circle')
-hold on
-
-% Plotting the eigenvalues computed using ResDMD
-plot_eigenvalues(setdiff(lambdas_EDMD, lambdas_ResDMD), 'm.', 'MarkerSize', 10, 'DisplayName', 'EDMD')
-plot_eigenvalues(lambdas_ResDMD, 'bx', 'Markersize', 10, 'DisplayName', "ResDMD")
-
-% Plotting the eigenvalues computed using DMD
-plot_eigenvalues(lambdas_DMD, 'go', 'MarkerSize', 10, 'DisplayName', 'DMD')
-axis square
-axis equal
-legend('Interpreter','latex','Location','bestoutside')
-title("$K = " + num2str(length(lambdas_EDMD)) + "$", 'Interpreter','latex', 'FontSize', 20)
-
-if saving
-    saveas(fig, "figures/pendulum/pendulum_DMD__N"+num2str(length(lambdas_EDMD)), 'epsc')
-    saveas(fig, "figures/pendulum/pendulum_DMD_N"+num2str(length(lambdas_EDMD)), 'png')
-end
 %% Phase portrait plots
 args = [0.4932, 0.9765, 1.4452, 1.8951];
-eigen_phase_portraits(args, psi, psi_0, psi_1, w, saving)
-
+if N == 100
+    eigen_phase_portraits(args, psi, psi_0, psi_1, w, saving)
+end
 %% ResDMD to estimate pseudospectrum
 epsilon_vals = [0.25];
-grid_points=100; 
+grid_points=250; 
 a = 1.5;
 if N == 20
     opts.npts = grid_points;
     opts.ax = [-a, a, -a, a];
     opts.levels = log10(epsilon_vals);
+    opts.no_graphics = 1;
     [grid,sigs] = ResDMD_pseudospectrum_v2(x0, x1, w, psi, opts, psi_0, psi_1); 
 elseif N == 100
     grid = complexgrid(-a, a, grid_points, -a, a, grid_points);
-    [grid, sigs] = ResDMD_pseudospectrum(x0, x1, w, psi, grid, psi_0, psi_1);
+    if loading
+        load workspaces\pendulum_N1256.mat
+    else
+        [sigs, ~] = ResDMD_pseudospectrum(x0, x1, w, psi, epsilon_vals(1), grid, psi_0, psi_1);
+    end
 end
 %% Pseudospectrum plot
 fig = figure();
@@ -102,8 +82,6 @@ theta = linspace(0, 2*pi, 1000);
 plot(exp(1i*theta), '-r')
 hold on
 % Plotting the eigenvalues
-%plot_eigenvalues(setdiff(lambdas_EDMD, lambdas_ResDMD), 'm.')
-%plot_eigenvalues(lambdas_ResDMD, 'bx')
 plot_eigenvalues(lambdas_EDMD, 'm.')
 % Drawing the estimated epsilon pseudospectrum
 for e = epsilon_vals

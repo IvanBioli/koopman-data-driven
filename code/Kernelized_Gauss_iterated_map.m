@@ -1,5 +1,5 @@
 %% PARAMETERS DEFINITION
-clearvars -except grid sigs
+clearvars -except grid sigs loading
 rng(0)
 addpath(genpath(pwd))
 saving = true;
@@ -29,8 +29,8 @@ for k = keySet
     x1 = F(x0);
 
     % Matrices to be used by EDMD
-    %A = kernel_gramian(kernel, x1, x0, w);
-    %G = kernel_gramian(kernel, x0, x0, w); G = (G + G')/2;
+    A = kernel_gramian(kernel, x1, x0, w);
+    G = kernel_gramian(kernel, x0, x0, w); G = (G + G')/2;
     
     % EDMD
     [lambdas, ~] = EDMD(x0, x1, w, fun_dict);

@@ -1,5 +1,5 @@
 %% PARAMETERS DEFINITION
-clear
+clearvars -except loading
 rng(0)
 addpath(genpath(pwd))
 saving = true;
@@ -17,7 +17,7 @@ M = 100;            % Number of quadrature points
 epsilon = 0.01;     % Tolerance for ResDMD
 
 %% QUADRATURE RULES
-flag = false;        % Flag for computing also for quadrature rules other than Gauss-Legendre
+flag = true;        % Flag for computing also for quadrature rules other than Gauss-Legendre
 quadratures = quadrature_nodes_weights(M, flag);
 
 %% DMD
@@ -93,6 +93,7 @@ end
 
 %% PSEUDOSPECTRUM APPROXIMATION
 disp('Starting Pseudospectrum Approximation')
+figure()
 epsilon_vals = [0.3, 0.1, 0.01, 0.001];
 N = 1000;
 zoom_shift = 0.6;
@@ -107,6 +108,7 @@ x1 = F(x0);
 opts.npts = N;
 opts.ax = [a1, b1, a2, b2];
 opts.levels = log10(epsilon_vals);
+opts.no_graphics = 1;
 [grid,sigs] = ResDMD_pseudospectrum_v2(x0, x1, w, fun_dict, opts); 
 %% Plotting the eigenvalues and the pseudospectra contours
 fig = figure();
@@ -126,29 +128,32 @@ if saving
 end
 %% CONVERGENCE OF THE GALERKIN MATRIX
 Kfun_dot_fun = @(x) fun_dict(x)' * fun_dict(F(x));
-Galerkin_exact = integral(Kfun_dot_fun, -1, 0,'ArrayValued', true);
 %%
 keySet = {'Gauss-Legendre', 'Trapezoidal', 'Riemann sum', 'Montecarlo'};
 valueSet = {[], [], [], []};
 errors = containers.Map(keySet, valueSet);
 Ms = round(logspace(1,4,100));
-
-for index = 1:length(Ms)
-    M = Ms(index);
-    fprintf('Iteration %d, M = %d\n', index, M);
-    quadratures = quadrature_nodes_weights(M, true);
+if loading
+    load workspaces\galerkin_convergence.mat
+else
+    Galerkin_exact = integral(Kfun_dot_fun, -1, 0,'ArrayValued', true);
+    for index = 1:length(Ms)
+        M = Ms(index);
+        fprintf('Iteration %d, M = %d\n', index, M);
+        quadratures = quadrature_nodes_weights(M, true);
+        
+        for k = keySet
+            key = string(k);
+            x0 = quadratures(key).x0;
+            x1 = F(x0);
+            w = quadratures(key).w;
+            % Computing the matrices psi_0 and psi_1
+            psi_0 = psi_matrix(fun_dict, x0);
+            psi_1 = psi_matrix(fun_dict, x1);
     
-    for k = keySet
-        key = string(k);
-        x0 = quadratures(key).x0;
-        x1 = F(x0);
-        w = quadratures(key).w;
-        % Computing the matrices psi_0 and psi_1
-        psi_0 = psi_matrix(fun_dict, x0);
-        psi_1 = psi_matrix(fun_dict, x1);
-
-        A = psi_0' * (w.* psi_1);
-        errors(key) = [errors(key), max(abs(A - Galerkin_exact), [],'all')];
+            A = psi_0' * (w.* psi_1);
+            errors(key) = [errors(key), max(abs(A - Galerkin_exact), [],'all')];
+        end
     end
 end
 
