@@ -1,9 +1,8 @@
 function y = hermite_fun(x,k_vec)
-% HERMITE_FUN Summary of this function goes here
-%   Detailed explanation goes here
+% Y = HERMITE_FUN(X, K_VEC) 
+%   Computes the hermite functions of orders in k_vec, at the points x
 
 kmax = max(k_vec);
-% epsi = []
 epsi=zeros(kmax+1, length(x));
 epsi(1,:)=(pi)^(-1/4)*exp(-0.5*(x.^2));                  % Zero Order (k=0) hermite function
 epsi(2,:)=(((pi)^(-1/4)*exp(-0.5*(x.^2))).*x)*sqrt(2);   % First Order (k=1) hermite function

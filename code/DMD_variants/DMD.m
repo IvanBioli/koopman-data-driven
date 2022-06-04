@@ -1,12 +1,18 @@
 function [Q,lambdas] = DMD(V)
-%DMD Summary of this function goes here
-%   Detailed explanation goes here
+% [Q, LAMBDAS] = DMD(V) 
+% Arnoldi-based Dynamic Mode Decomposition
+% INPUT:
+%   - V: snapshot sequence matrix. Contains one snapshot per column.
+% OUTPUT:
+%   - Q: Ritz vectors
+%   - lambdas: Ritz values
 
-N = size(V,2);          % Number of snapshots
-v_N = V(:, end);        % Last snapshot
-V = V(:, 1:end-1);    % First N-1 snapshots
+N = size(V,2);  % Number of snapshots
+v_N = V(:, end);  % Last snapshot
+V = V(:, 1:end-1);  % First N-1 snapshots
 
 a = pinv(V) * v_N;      % Last column of the companion matrix
+% Building the companion matrix
 S = spdiags(ones(N-1,1), -1, N-1, N-1);
 S(:, end) = a;
 

@@ -1,3 +1,4 @@
+%% RESULTS FOR THE GAUSS ITERATED MAP EXAMPLE - KERNELIZED ALGORITHMS
 %% PARAMETERS DEFINITION
 clearvars -except grid sigs loading
 rng(0)
@@ -19,16 +20,16 @@ epsilon = 0.1;     % Tolerance for ResDMD
 M = N;
 quadratures = quadrature_nodes_weights(M, false);
 keySet = {'Gauss-Legendre'};
+% Defining the Kernel from the dictionary
 kernel = @(x, y) fun_dict(x) * fun_dict(y)';
 
 for k = keySet
     key = string(k);
-    disp(key)
     x0 = quadratures(key).x0;
     w = quadratures(key).w;
     x1 = F(x0);
 
-    % Matrices to be used by EDMD
+    % Computing the Gramian matrices to be used by K-EDMD
     A = kernel_gramian(kernel, x1, x0, w);
     G = kernel_gramian(kernel, x0, x0, w); G = (G + G')/2;
     
@@ -36,15 +37,16 @@ for k = keySet
     [lambdas, ~] = EDMD(x0, x1, w, fun_dict);
     % ResDMD to remove spectral pollution
     [lambdas_res, ~] = ResDMD(x0, x1, w, fun_dict, epsilon);
-
+    % Plot of the EDMD and ResDMD eigenvalues approximations
     fig = figure();
     plot_eigenvalues(setdiff(lambdas, lambdas_res), 'g.', 'MarkerSize', 10, 'DisplayName', 'EDMD')
     hold on
     plot_eigenvalues(lambdas_res, 'bx', 'MarkerSize', 10, 'DisplayName', 'ResDMD')
-
+    
+    % KEDMD
     [lambdas, KFun] = KEDMD(x0, x1, w, kernel, 0, G, A, 0);
+    % Plot of the KEDM eigenvalues approximation
     plot_eigenvalues(lambdas, 'ro', 'MarkerSize', 10, 'DisplayName', 'KEDMD')
-    %title(key, 'FontSize', 20);
     legend('Location','northeast')
     axis square
     axis equal
@@ -61,7 +63,7 @@ quadratures = quadrature_nodes_weights(M, true);
 keySet = {'Montecarlo'};
 K_dominants = 40;
 
-% Kernels
+% RBF kernel definition
 gamma = 1./mean((quadratures('Montecarlo').x0-mean(quadratures('Montecarlo').x0)).^2)^2;
 kernels = {@(x, y) exp(-gamma*(x-y)^2)};
 
@@ -72,14 +74,14 @@ for i = 1:length(kernels)
         x0 = quadratures(key).x0;
         w = quadratures(key).w;
         x1 = F(x0);
-        % Matrices to be used by EDMD
+
+        % Matrices to be used by EKDMD
         A = kernel_gramian(kernel, x1, x0, w);
         G = kernel_gramian(kernel, x0, x0, w); G = (G + G')/2;
-        fprintf('cond(A) = %e,\t rank(A) = %d\n', cond(A), rank(A))
-        fprintf('cond(G) = %e,\t rank(G) = %d\n', cond(G), rank(G))
-        % Adding regularization
-        eta = 1e-16; % Regularization parameter
         fig = figure();
+
+        % Plot of the contour lines computed in Gauss_iterated_map.m as a
+        % reference to evaluate the accuracy of KEDM
         epsilon_vals = [0.3, 0.1, 0.01, 0.001];
         for e = epsilon_vals
             mask = sigs < e;
@@ -87,16 +89,23 @@ for i = 1:length(kernels)
             hold on
         end
         axis square
+
+        % First step: extraction of the dictionary using KEDMD
+        eta = 1e-16; % Regularization parameter
         [lambdas_1step, KFun] = KEDMD(x0, x1, w, kernel, K_dominants,G,A,eta);
+        % Plot of the approximated eigenvalues after the first step
         plot_eigenvalues(lambdas_1step, 'g.', 'MarkerSize', 10, 'DisplayName', 'KEDMD-Step 1')
         hold on
-        %KResDMD
+        
+        % Second step (KResDMD): Applying EDMD and ResDMD from the
+        % dictionary computed in the previous step
         quadratures = quadrature_nodes_weights(M, true);
         x0 = quadratures('Gauss-Legendre').x0;
         w = quadratures('Gauss-Legendre').w;
         x1 = F(x0);
         [lambdas_2step, ~] = EDMD(x0, x1, w, KFun);
         [lambdas_res_2step, ~] = ResDMD(x0, x1, w, KFun, epsilon);
+        % Plot of the eigenvalues approximations
         plot_eigenvalues(setdiff(lambdas_2step, lambdas_res_2step), 'r.', 'MarkerSize', 10, 'DisplayName', 'Step 2')
         plot_eigenvalues(lambdas_res_2step, 'bx', 'MarkerSize', 10, 'DisplayName', 'KResDMD')
         axis square

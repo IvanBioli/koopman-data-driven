@@ -1,6 +1,13 @@
 function [Q,lambdas] = Snapshot_DMD(X, Y, tsvd_flag)
-%Snapshot_DMD Summary of this function goes here
-%   Detailed explanation goes here
+% [Q, LAMBDAS] = SNAPSHOT_DMD(X, Y, TSVD_FLAG) 
+% SVD-based Dynamic Mode Decomposition for snapshot pairs
+% INPUT:
+%   - X: matrix of the initial snapshots. Contains one snapshot per column.
+%   - Y: matrix of the final snapshots. Contains one snapshot per column.
+%   - tsvd_flag: true to use TSVD
+% OUTPUT:
+%   - Q: Ritz vectors
+%   - lambdas: Ritz values
 
 if nargin < 3
     tsvd_flag = false;

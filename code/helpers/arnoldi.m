@@ -1,6 +1,6 @@
 function [U, H] = arnoldi(x, Afun, it, reorth_tol)
-%ARNOLDI Summary of this function goes here
-%   Detailed explanation goes here
+% [U, H] = ARNOLDI(X, AFUN, IT, REORTH_TOL)
+%   Implementation of the Arnoldi method
 
 % Default reorth_tol = 0.7
 if nargin < 4

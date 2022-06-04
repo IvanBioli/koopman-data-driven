@@ -1,14 +1,34 @@
 function [lambdas, varargout] = KEDMD(x0, x1, w, k, K_dominants, varargin)
-%KEDMD Summary of this function goes here
-%   Detailed explanation goes here
+% [LAMBDAS, VARARGOUT] = KEDMD(X0, X1, W, K, K_DOMINANTS, VARARGIN)
+%   Kernelized Extended Dynamic Mode Decomposition
+% INPUT:
+%   - x0: matrix of the initial snapshots. Contains one snapshot per column.
+%   - x1: matrix of the final snapshots. Contains one snapshot per column.
+%   - w: weights vector
+%   - k: kernel
+%   - K_dominants: number of dominants eigenpairs to retain. If equal to 
+%     zero, retains all the approximated eigenpairs. 
+%   - varargin (optional):
+%       - A, G: gramian matrices (must be varargin{1} and varargin{2})
+%       - eta: regularization parameter (must be varargin{3})
+%       - 'valuesOnly': compute approximate eigenvalues only
+%       - 'modes': compute also approximate eigenmodes
+% OUTPUT:
+%   - lambdas: eigenvalues approximations
+%   - varargout (optional, according to what in input in varargin):
+%       - varargout{1}: approximate eigenfunctions
+%       - varargout{2}: approximate eigenmodes
+
 M = size(x0,1); % Number of datapoints
 tol = 1e-3;
 
-if length(varargin) > 2     % If matrices and eta in input
+if length(varargin) > 2     % If matrices G, A and eta in input
     G = varargin{1};
     A = varargin{2};
     eta = varargin{3};
-else                        % Computing the matrices with the kernel trick
+% If not in input, compute the matrices with the kernel trick and set the
+% regularization parameter 
+else                        
     eta = 1e-16;
     A = kernel_gramian(k, x1, x0, w);
     G = kernel_gramian(k, x0, x0, w); 
@@ -24,7 +44,7 @@ G = (G + G')/2;
 S = sqrt(S);
 K = pinv(S, tol) * Q' * A * Q * pinv(S, tol);
 
-% Solving for approximate eigenvectors only
+% Solving for approximate eigenvalues only
 if sum(strcmp('valuesOnly', varargin)) > 0
     if K_dominants == 0
         lambdas = eig(K);

@@ -1,6 +1,16 @@
 function  eigen_phase_portraits(args, psi, psi_0, psi_1, w, save)
-%EIGEN_PHASE_PORTRAITS Summary of this function goes here
-%   Detailed explanation goes here
+% EIGEN_PHASE_PORTRAITS(ARGS, PSI, PSI_0, PSI_1, W, SAVE)
+%  Plots the phase portraits of the approximate eigenfunctions corresponding 
+%  to the eigenvalues in e^(1i*args)
+% INPUT:
+%   - args: argument of the complex eigenvalues
+%   - psi: dictionary of observables
+%   - psi_0: matrix of the evaluations of the dictionary at the initial
+%       datapoints
+%   - psi_1: matrix of the evaluations of the dictionary at the final
+%       datapoints
+%   - w: weights associated to the datapoints
+%   - save: true to save the figures
 
 % Mesh for the plots
 n = 1000; 
@@ -19,7 +29,7 @@ for theta = args
         D = C - lambda * B' - conj(lambda) * B + abs(lambda)^2 * A;
         D = (D+D')/2;
         [g,t] = eigs(D,A,1,'smallestabs');
-        assert(t < 0.05)            % Error if the residual is above 0.05
+        assert(t < 0.05)            % Assertion error if the residual is above 0.05
         f = @(x) psi(x) * g;        % Function of which the phase portrait is plotted
         fig = figure();
 
@@ -37,8 +47,6 @@ for theta = args
         title("$\lambda = \exp{(" + num2str(theta) + "i)}$", 'Interpreter','latex','FontSize', 20)
         if save
             set(gca,'LooseInset',get(gca,'TightInset'));
-%            saveas(fig, "figures/pendulum/phase_portrait_"+num2str(theta* 1e4), 'eps')
-%            saveas(fig, "figures/pendulum/phase_portrait_"+num2str(theta* 1e4), 'png')
             exportgraphics(gca,"figures/pendulum/phase_portrait_"+num2str(theta* 1e4)+".png")
             exportgraphics(gca,"figures/pendulum/phase_portrait_"+num2str(theta* 1e4)+".png")
         end

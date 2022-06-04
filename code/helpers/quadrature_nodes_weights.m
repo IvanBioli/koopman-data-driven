@@ -1,4 +1,9 @@
 function quadratures = quadrature_nodes_weights(M, flag)
+% QUADRATURES = QUADRATURE_NODES_WEIGHTS(M, FLAG) 
+%   Computes M quadrature nodes and weights in the interval [-1,0]. 
+%   If flag is false, only Gauss-Legendre nodes and weights are computed, 
+%   otherwise also according to the trapezoidal quadrature rule, Riemann 
+%   sum quadrature rule and Montecarlo quadrature rule.
 
 quadratures = containers.Map;
 

@@ -1,35 +1,22 @@
+%% COMPARISON OF DMD (ARNOLDI BASED AND SVD-BASED) WITH ARNOLDI
 %% PARAMETERS DEFINITION
 clearvars -except loading
 rng(0);
 addpath(genpath(pwd))
 saving = true;
-matrix = '';
 
 n = 400;            % Size of the matrix
 it = 60;            % Number of iterations
 k = 10;              % Eigenpairs to monitor
 
 % Definition of the matrix
-if strcmp(matrix, 'random')
-    A = randn(n,n);
-    A = (A + A') / 2;
-    d = eig(A);
-    d = sort(d, 'descend');
-elseif strcmp(matrix, 'loss')
-    e = sort([5; randn(n-1,1)]); 
-    A = spdiags(e, 0, n, n); 
-    A(1,end) = 1000;
-    d = eig(full(A));
-    d = sort(d, 'descend');
-else
-    beta = 1;
-    gamma = 0.99;
-    alpha = 0.8;
-    d = [beta; gamma; alpha.^(1:n-2)'];
-    A = spdiags(d, 0, n, n);
-    [Q,~] = qr(randn(n)); 
-    A = Q'*A*Q;
-end
+beta = 1;
+gamma = 0.99;
+alpha = 0.8;
+d = [beta; gamma; alpha.^(1:n-2)'];
+A = spdiags(d, 0, n, n);
+[Q,~] = qr(randn(n)); 
+A = Q'*A*Q;
 Afun = @(x) A*x;
 x = rand(n,1); x = x/norm(x);      % Initial vector
 
@@ -52,7 +39,7 @@ for i = 1:it
     arnoldi_reorth_error(i, 1:min(i,k)) = abs(eigv - d(1:min(i,k)))';
 end
 
-%% ARNOLDI - DMD
+%% ARNOLDI-BASED DMD
 DMD_error = zeros(it, k);
 DMD_error((1:it)' < (1:k)) = nan;
 for i = 1:it
@@ -61,7 +48,7 @@ for i = 1:it
     DMD_error(i, 1:min(i,k)) = abs(lambdas(1:min(i,k)) - d(1:min(i,k)))';
 end
 
-%% SVD - DMD
+%% SVD-BASED DMD
 DMD_SVD_error = zeros(it, k);
 DMD_SVD_error((1:it)' < (1:k)) = nan;
 for i = 1:it

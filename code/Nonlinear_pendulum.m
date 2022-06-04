@@ -1,10 +1,12 @@
+%% RESULTS FOR THE NONLINEAR PENDULUM EXAMPLE
 %% PARAMETERS
 clearvars -except loading N
 addpath(genpath(pwd))
 saving = false;
 
 delta_t = 0.5;          % Time step for discretization
-
+% Selecting the number of datapoints for different orders of the hyperbolic
+% cross approximation
 if N == 20
     M = 100 -1;
     L = 10;
@@ -28,21 +30,25 @@ for i = deg
     hold on
 end
 %}
+
 % Creating the quadrature grid and the corresponding weights
+
 % For x1 we consider the interval [-pi,pi] since the Fourier basis is
 % periodic with period 2*pi
 x1_grid = linspace(-pi, pi, M+1);
 w1 = 2 * pi * ones(M+1, 1) / M; w1(1) = w1(1) / 2; w1(end) = w1(end) / 2;
+
 % For x2 we truncate the quadrature to the interval [-L,L]
 x2_grid = linspace(-L, L, M+1);
 w2 = 2 * L * ones(M+1, 1) / M; w2(1) = w2(1) / 2; w2(end) = w2(end) / 2;
-% Meshing the quadrature nodes and weight
+
+% Meshing the quadrature nodes and weights
 [x0_1,x0_2] = meshgrid(x1_grid,x2_grid); 
 x0_1 = x0_1(:); x0_2 = x0_2(:); 
 x0 = [x0_1,x0_2];                   % One row per datapoint
 w = w1 * w2'; w = w(:);             % Weight vector
 
-%% EIGENVALUES COMPUTATION
+%% DATAPOINTS COMPUTATION
 x1 = pendulum_step(x0, delta_t);            % One step of the pendulum
 psi = hyperbolic_approximant(N);            % Hyperbolic cross approximation dictionary
 % Computing the matrices outside the functions to compute them only once
@@ -58,8 +64,8 @@ if N == 100
     eigen_phase_portraits(args, psi, psi_0, psi_1, w, saving)
 end
 %% ResDMD to estimate pseudospectrum
-epsilon_vals = [0.25];
-grid_points=250; 
+epsilon_vals = [0.25];  % Values of the epsilon for which to plot the contour lines
+grid_points=250; % Number of gridpoints per dimension
 a = 1.5;
 if N == 20
     opts.npts = grid_points;
@@ -70,7 +76,7 @@ if N == 20
 elseif N == 100
     grid = complexgrid(-a, a, grid_points, -a, a, grid_points);
     if loading
-        load workspaces\pendulum_N1256.mat
+        load workspaces\pendulum_100.mat
     else
         [sigs, ~] = ResDMD_pseudospectrum(x0, x1, w, psi, epsilon_vals(1), grid, psi_0, psi_1);
     end
