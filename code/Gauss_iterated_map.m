@@ -96,7 +96,6 @@ for k = keySet
 end
 
 %% PSEUDOSPECTRUM APPROXIMATION
-disp('Starting Pseudospectrum Approximation')
 figure()
 epsilon_vals = [0.3, 0.1, 0.01, 0.001];
 N = 1000;
