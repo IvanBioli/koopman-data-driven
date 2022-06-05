@@ -1,5 +1,5 @@
 \label{chapter_edmd}
-In this third chapter, we introduce Extended Dynamic Mode Decomposition as a method for approximating eigenpairs from a dictionary of observables. In \Cref{section_resdmd} we introduce the problem of spectral pollution, and we explain how Residual DMD (ResDMD) can be used to remove it. Then we present pseudospectra as an effective method to individuate spectral pollution, as well as the use of ResDMD for approximating the pseudospectrum of the Koopman Operator. Finally, in \Cref{section_experiments} we reproduce some of he numerical examples presented in \cite{colbrook_rigorous_2021}.
+In this third chapter, we introduce Extended Dynamic Mode Decomposition (EDMD) as a method for approximating eigenpairs from a dictionary of observables. In \Cref{section_resdmd} we introduce the problem of spectral pollution, and we explain how Residual DMD (ResDMD) can be used to remove it. Then we present pseudospectra as an effective method to individuate spectral pollution, as well as the use of ResDMD for approximating the pseudospectrum of the Koopman Operator. Finally, in \Cref{section_experiments} we reproduce some of the numerical examples presented in \cite{colbrook_rigorous_2021}.
 
 \section{Extended Dynamic Mode Decomposition (EDMD)}
 \label{section_edmd}
@@ -19,7 +19,7 @@ We aim at generating $\vb*{K}\in\C^{k\times k}$ finite dimensional approximation
     \label{k_finite_dimensional}
     \mathcal{K}\vb{\phi} = (\Psi \circ \vb{F})\vb{a} = \Psi\vb*K\vb{a} + r
 \end{equation}
-where the residual term $r = r(\vb{a}, \vb{x})$ is due to the fact that, in general, $\Span(\mathcal{D})$ is not $\mathcal{K}$-invariant. To obtain the "best" $\vb*{K}\in\C^{K\times K}$ it is natural to minimize the norm of the point-wise maximum of the residual of all possible $\phi\in\Span(\mathcal{D})$, i.e to solve the following problem \cite{colbrook_rigorous_2021}:
+where the residual term $r = r(\vb{a}, \vb{x})$ is due to the fact that, in general, $\Span(\mathcal{D})$ is not $\mathcal{K}$-invariant. To obtain the "best" $\vb*{K}\in\C^{K\times K}$ it is natural to minimize the norm of the point-wise maximum of the residual of all possible $\phi\in\Span(\mathcal{D})$, with some kind of normalisation. Hence we aim at solving the following problem \cite{colbrook_rigorous_2021}:
 \begin{equation}
     \label{edmd_integral_problem}
     \argmin_{\vb*{K}\in\C^{K\times K}}\int_{\Omega} \max_{\vb{a}\in\C^k \\ \norm{\vb{a}} = 1}\abs{r(\vb{a}, \vb{x})}^2 d\omega(\vb{x}) = 
@@ -206,7 +206,7 @@ If $\widetilde{\mathrm{res}}(\lambda, \phi) > \varepsilon$, the eigenpair $(\lam
 \textbf{Output:} Approximation of the eigenvalues ($\lambda_j$), eigenfunctions ($\phi_j$) with $\widetilde{\mathrm{res}}(\lambda_j, \phi)_j < \varepsilon$
 \end{algorithm}
 
-The above-described cleanup procedure avoids spectral pollution and, if the quadrature converges, in the large data limit, removes eigenpairs with a residual above the prescribed tolerance $\varepsilon$ ,and retains only eigenpairs that are inside the $\varepsilon$-pseudospectrum of $\mathcal{K}$. This is precised in the following proposition.
+The above-described cleanup procedure avoids spectral pollution and, if the quadrature converges, in the large data limit, removes eigenpairs with a residual above the prescribed tolerance $\varepsilon$, and retains only eigenpairs that are inside the $\varepsilon$-pseudospectrum of $\mathcal{K}$. This is precised in the following proposition.
 \begin{prop}[\cite{colbrook_rigorous_2021}, Theorem 4.1]
 Assume that the quadrature rule converges, i.e. that
 \begin{equation*}
@@ -332,7 +332,7 @@ The Gauss iterated map is a function $F:\R\to\R$ defined by $F(x) =\exp(\alpha x
 
 \Cref{fig_resdmd_quadrature_comparison} shows the approximations of the eigenvalues of the Koopman Operator computed using DMD, EDMD and ResDMD for each of the four quadrature rules. \Cref{gauss_pseudospectrum_convergence} shows the approximation of the $\varepsilon$-pseudospectrum for $\varepsilon = 0.3,\,0.1,\,0.01,\,0.001$ computed using \Cref{alg_pseudospectrum}, and the convergence of the different quadrature rules measured as $\max_{1\leq j,k \leq K} \abs{(\Psi_0^* W \Psi_1)_{jk} - \langle\mathcal{K}\psi_k, \psi_j\rangle}$.
 
-It can be seen that, for the Montecarlo and the Riemann Sums quadrature rules, which use the same weights for all quadrature points, EDMD and DMD compute the same eigenvalues (magenta dots and green pluses overlap in \Cref{fig_resdmd_quadrature_comparison}). The outputs of the two algorithms are slightly dissimilar for the Trapezoidal rule, which changes the weights only at the extremes, while they significantly differ for the Gauss-Legendre rule.
+It can be seen that, for the Montecarlo and the Riemann Sums quadrature rules, which use the same weights for all quadrature points, EDMD and DMD compute the same eigenvalues (magenta dots are the centres of the green circles in \Cref{fig_resdmd_quadrature_comparison}). The outputs of the two algorithms are slightly dissimilar for the Trapezoidal rule, which changes the weights only at the extremes, while they significantly differ for the Gauss-Legendre rule.
 
 The convergence rates are in agreement with standard theoretical results on numerical integration \cite{quarteroni_numerical_2007}, with the Gauss-Legendre quadrature converging exponentially and the other quadrature rules polynomially. It can be understood that, if one has the possibility of choosing the initial condition of the snapshot data, selecting them wisely can make the discretized problem significantly closer to the continuous one. This has a strong impact also on the accuracy of the eigenvalues computed using \Cref{alg_resdmd}. Indeed, the more accurate is the computation of the residual's integral, the more eigenvalues can be removed due to a too high residual, as shown in \Cref{fig_resdmd_quadrature_comparison}.
 

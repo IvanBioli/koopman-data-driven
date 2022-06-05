@@ -90,7 +90,7 @@ and statement $(iv)$ follows. Finally, applying the Bauer-Fike theorem \cite{gol
 \end{proof}
 
 \section{SVD-based DMD}
-The above mentioned method was the original version of the DMD \cite{schmid_dynamic_2010}. However, even if it mathematically correct and equivalent to the Arnoldi method in exact arithmetic (see \Cref{section_dmd_arnoldi}), an implementation using the companion matrix $\vb*{S}$ gives rise to a numerically unstable algorithm that is usually not capable to extract more than one or two dominant eigenpairs. Indeed, as already pointed out, the matrix $\vb*{V}_1^{N-1}$ might be numerically rank deficient, hence ill conditioned. Therefore, even when a QR-factorization $\vb*{V}_1^{N-1} = \vb*{Q}\vb*{R}$ is available, it is not advised to compute $\vb{a}$ as $\vb{a} = \vb*{R}^{-1}\vb*{Q}\vb{v}_N$ or $\vb*{S}$ as $\vb*{S} = \vb*{R}^{-1}\vb*{Q}\vb*{A}\vb*{V}_1^{N-1}$. 
+The above mentioned method was the original version of the DMD \cite{schmid_dynamic_2010}. However, even if mathematically correct and equivalent to the Arnoldi method in exact arithmetic (see \Cref{section_dmd_arnoldi}), an implementation using the companion matrix $\vb*{S}$ gives rise to a numerically unstable algorithm that is usually not capable to extract more than one or two dominant eigenpairs. Indeed, as already pointed out, the matrix $\vb*{V}_1^{N-1}$ might be numerically rank deficient, hence ill conditioned. Therefore, even when a QR-factorization $\vb*{V}_1^{N-1} = \vb*{Q}\vb*{R}$ is available, it is not advised to compute $\vb{a}$ as $\vb{a} = \vb*{R}^{-1}\vb*{Q}\vb{v}_N$ or $\vb*{S}$ as $\vb*{S} = \vb*{R}^{-1}\vb*{Q}\vb*{A}\vb*{V}_1^{N-1}$. 
 
 Using the Singular Value Decomposition (SVD) it is possible to obtain a mathematically equivalent but better-conditioned algorithm, which is particularly useful when $\vb*{V}_1^{N-1}$ is close to singular (it is very likely to happen for large $N$). This second version of the DMD is what nowadays is referred as DMD. Suppose that we computed a SVD of the snapshots matrix
 \begin{equation*}
@@ -116,7 +116,7 @@ As previously mentioned, the two approaches are equivalent since $\vb*{S}$ and $
 Suppose that $\vb*{V}_1^{N-1}$ is of full column rank and let $\vb*{V}_1^{N-1} = \vb*{U}\vb*{\Sigma}\vb*{W}^{*}$ be its SVD. Given $k\in\{1,2,\dots, N-1\}$, let us define $\vb*{U}_k = \vb*{U}(\,:\,, 1:k)$, $\vb*{W}_k = \vb*{W}(\,:\,, 1:k)$, $\vb*{\Sigma}_k = \vb*{\Sigma}(1:k, 1:k)$ and finally $\widetilde{\vb*{S}} = \vb*{U}_k^*\vb*{V}_2^N\vb*{W}_k\vb*{\Sigma}_k^{-1}$. Then:
 \begin{enumerate}[label=(\roman*)]
     \item if $k = N-1$, i.e. if we do not truncate the SVD, then $\widetilde{\vb*{S}}$ is similar to $\vb*{S}$, where $\vb*{S}$ is defined as in \eqref{S_definition} and the similarity is realized by the matrix $\vb*{W}\vb*{\Sigma}^{-1}$.
-    \item if $k < N-1$, then $\widetilde{\vb*{S}}$ is the matrix representation in the basis $\vb*{W}_k\vb*{\Sigma}^{-1}_k$ of the projection onto $\range(\vb*{W}_l\vb*{\Sigma}^{-1}_k)$ of the linear operator defined by $\vb*{S}$ restricted to $\range(\vb*{W}_k\vb*{\Sigma}^{-1}_k)$.
+    \item if $k < N-1$, then $\widetilde{\vb*{S}}$ is the matrix representation in the basis $\vb*{W}_k\vb*{\Sigma}^{-1}_k$ of the projection onto $\range(\vb*{W}_k\vb*{\Sigma}^{-1}_k)$ of the linear operator defined by $\vb*{S}$ restricted to $\range(\vb*{W}_k\vb*{\Sigma}^{-1}_k)$.
     \item $\widetilde{\vb*{S}}$ is the matrix representation in the basis $\vb*{U}_k$ of the projection onto $\range(\vb*{U}_k)$ of the linear operator defined by $\vb*{A}$ restricted to $\range(\vb*{U}_k)$.
 \end{enumerate}
 \end{prop}
@@ -186,21 +186,21 @@ and therefore $\vb*{Q}_{N-1}^*\vb{r} = \vb*{0}$.Plugging the QR-decomposition in
 and multiplying by $\vb*{Q}_{N-1}^*$ on the left and by $\vb*{R}_{N-1}^{-1}$ on the right
 \begin{equation}
     \label{similarity_arnoldi_dmd}
-    \vb*{H}_{N-1} = \vb*{Q}_{N-1}\vb*{A}\vb*{Q}_{N-1} = \vb*{R}_{N-1}\vb*{S}\vb*{R}_{N-1}^{-1}.
+    \vb*{H}_{N-1} = \vb*{Q}_{N-1}^*\vb*{A}\vb*{Q}_{N-1} = \vb*{R}_{N-1}\vb*{S}\vb*{R}_{N-1}^{-1}.
 \end{equation}
 Hence $\vb*{H}_{N-1}$ and $\vb*{S}$ are linked through a similarity transformation and, in particular, have the same eigenvalues. As a consequence of \Cref{prop_svd_dmd}, this is true also if we apply the SVD-based DMD without truncation.
 
-Let $\vb*{M}_{N-1}$ be the eigenvector matrix of $\vb*{H}_{N-1}$, then the Ritz vectors returned by the Arnoldi method are the columns of $\vb*{Q}_{N-1}\vb*{M}_{N-1}$. From \eqref{similarity_arnoldi_dmd}, the eigenvector matrix of $\vb*{S}$ is $\vb*{R}_{N-1}^{-1}\vb*{M}_{N-1}$, thus the Ritz vectors returned by the DMD algorithm are the columns of $\vb*{V}_1^{N-1}\vb*{R}_{N-1}^{-1}\vb*{M}_{N-1} = \vb*{Q}_{N-1}\vb*{R}_{N-1}\vb*{R}_{N-1}^{-1}\vb*{M}_{N-1} = \vb*{Q}_{N-1}^{-1}\vb*{M}_{N-1}$ and also the Ritz vectors coincide.
+Let $\vb*{M}_{N-1}$ be the eigenvector matrix of $\vb*{H}_{N-1}$, then the Ritz vectors returned by the Arnoldi method are the columns of $\vb*{Q}_{N-1}\vb*{M}_{N-1}$. From \eqref{similarity_arnoldi_dmd}, the eigenvector matrix of $\vb*{S}$ is $\vb*{R}_{N-1}^{-1}\vb*{M}_{N-1}$, thus the Ritz vectors returned by the DMD algorithm are the columns of $\vb*{V}_1^{N-1}\vb*{R}_{N-1}^{-1}\vb*{M}_{N-1} = \vb*{Q}_{N-1}\vb*{R}_{N-1}\vb*{R}_{N-1}^{-1}\vb*{M}_{N-1} = \vb*{Q}_{N-1}\vb*{M}_{N-1}$ and also the Ritz vectors coincide.
 \end{proof}
 
 
 Although the two algorithms are equivalent mathematically and in exact arithmetic, the Arnoldi algorithm is numerically more stable. Indeed, as the number of snapshots increases, the vectors tend to become linearly dependent and, therefore, the matrix $V_1^N$ becomes close to singular, hence ill-conditioned. Even if the problem can be partially solved using the SVD-based DMD and performing a truncated SVD, another major problem is intrinsic to the data-driven approach. One of the major strengths of the Arnoldi algorithm is that it does not even compute the vectors $\vb{x}_j = \vb*{A}^j \vb{x}_0$, as errors are already made in these computations. However, in a data-driven perspective, this is not possible since what we are given is a sequence of snapshots and not the matrix $\vb*{A}$. Hence, we trade-off better stability and convergence properties for an algorithm that only relies on $V_1^N$ and is therefore applicable to snapshots experimentally collected.
 
-In order to compare the algorithms from the numerical pont of view, we performed 60 iterations with the matrix \texttt{A} of size \texttt{n = 400} defined as \texttt{A = diag([1, 0.9, 0.8.\^{}(1:n-2)])} and a normalised random starting vector \texttt{x = rand(n,1)}. \Cref{fig_arnoldi_vs_DMD} shows the convergence of the approximations of the five dominant eigenvalues. It can be seen that the Arnoldi method is able to approximate all of them up to the epsilon-machine-precision. The Arnoldi-based DMD approximates the first two dominant eigenvalues with an accuracy that is eight orders of magnitude lower than the one obtained with the SVD-based DMD. Moreover, it fails in approximating the remaining 3 eigenvalues. The SVD-based DMD is able to approximate all five dominant eigenvalues, with an accuracy that is lower than the one of the Arnoldi algorithm, but still acceptable. 
+In order to compare the algorithms from S numerical point of view, we performed 60 iterations with the matrix \texttt{A} of size \texttt{n = 400} defined as \texttt{A = Q'*diag([1, 0.9, 0.8.\^{}(1:n-2)])*Q}, where \texttt{Q} is an orthogonal matrix. and a normalised random starting vector \texttt{x = rand(n,1)}. \Cref{fig_arnoldi_vs_DMD} shows the convergence of the approximations of the five dominant eigenvalues. It can be seen that the Arnoldi method is able to approximate all of them up to the epsilon-machine-precision. The Arnoldi-based DMD approximates the first two dominant eigenvalues with an accuracy that is eight orders of magnitude lower than the one obtained with the SVD-based DMD. Moreover, it fails in approximating the remaining 3 eigenvalues. The SVD-based DMD is able to approximate all five dominant eigenvalues, with an accuracy that is lower than the one of the Arnoldi algorithm, but still acceptable. 
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.5\linewidth]{../code/figures/Arnoldi_vs_DMD.eps}
-    \caption{Convergence of the five dominant eigenvalues for the Arnoldi method, the Arnoldi-based DMD algorithm and the SVD-based DMD algorithm. 60 iterations are performed with the matrix \texttt{A} of size \texttt{n = 400} defined as \texttt{A = Q'*diag([1, 0.9, 0.8.\^{}(1:n-2)])*Q}}, where \texttt{Q} is an orthogonal matrix.
+    \caption{Convergence of the five dominant eigenvalues for the Arnoldi method, the Arnoldi-based DMD algorithm and the SVD-based DMD algorithm. 60 iterations are performed with the matrix \texttt{A} of size \texttt{n = 400} defined as \texttt{A = Q'*diag([1, 0.9, 0.8.\^{}(1:n-2)])*Q}, where \texttt{Q} is an orthogonal matrix.}
     \label{fig_arnoldi_vs_DMD}
 \end{figure}
 
@@ -240,23 +240,3 @@ In analogy to what has been done in the linear case, $\vb*{K} = \vb*{G}_1\vb*{G}
 
 
 The interpretation of $\vb*{K}$ as the best finite-dimensional approximation of the Koopman Operator gives an idea of why \Cref{alg_koopman_dmd} might work. However, this does not provide a mathematical foundation for the method, and indeed in \cite{tu_dynamic_2014, bagheri_koopman-mode_2013} it is argued that in the non-linear case \Cref{alg_koopman_dmd} might not perform well in general. However, under fairly restrictive hypothesis, \Cref{alg_koopman_dmd} outputs approximations of the Koopman modes and associated eigenvalues that are indistinguishable from the exact ones using the available data. We refer the reader to \cite{rowley_spectral_2009, tu_dynamic_2014} for a more precise statement.
-
-\begin{comment}
-\textcolor{red}{
-\begin{prop}[\cite{rowley_spectral_2009, tu_dynamic_2014}]
-Let $\vb{g} = \vb{g}(\vb{x})$ be the vector-valued observable of interest and let $\vb*{G}_0,\, \vb*{G}_1$ be defined as in \eqref{dmd_koopman_matrices}. Let us further assume that
-\begin{enumerate}[label=(\roman*)]
-    \item each component of $\vb{g}$ lies in the span of the Koopman eigenfunctions;
-    \item $\vb*{K}\vb*{G}_0 = \vb*{G}_1$, i.e. the residual of the least-square approximation is zero;
-    \item $\vb*{K}$ is diagonalizable.
-\end{enumerate}
-Then the DMD eigenvalues and modes in output of \Cref{alg_koopman_dmd} are INDISTINGUISHABLE FROM?? Koopman eigenvalues and Koopman eigenmodes. 
-\end{prop}}\textcolor{red}{
-\begin{proof}
-Let $\{(\lambda_j, \vb{v}_j)\}$ be the DMD eigenpair, i.e. $\vb*{K}\vb{v}_j = \lambda_j\vb{v}_j$. Since $\vb*{K}$ is diagonalizable we can write $\vb{g}(\vb{x}_i) = \sum_j c_{ji}\vb{v}_j $ for some coefficients $c_{ji}$. Reading the matrix equality $\vb*{K}\vb*{G}_0 = \vb*{G}_1$ by columns we get:
-\begin{equation*}
-    \mathcal{K}\vb{g}(\vb{x}_i) = \vb{g}(\vb{F}(\vb{x}_i)) = \vb*{K}\vb{g}(\vb{x}_i) = \sum_j c_{ji}\vb*{K}\vb{v}_j = \sum_j c_{ji}\lambda_j\vb{v}_j.
-\end{equation*}
-Comparing the previous equation with \eqref{koopman_modes}....
-\end{proof}}
-\end{comment}
