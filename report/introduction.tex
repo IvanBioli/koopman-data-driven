@@ -4,7 +4,7 @@ Dynamical systems are mathematical models describing the variability of a state 
     \label{dynamical_system}
     \vb{x}_{n+1} = \vb{F}(\vb{x}_n)\,\,\,n\geq 0, \qquad \vb{F}:\Omega \to \Omega
 \end{equation}
-where $\vb{x}_0$ is a given initial condition. We are interested in analyzing the system's behaviour from its trajectories $\vb{x}_0, \vb{x}_1, \vb{x}_2,...$, or more in general measurements of these trajectories collected through data. Observe that the discrete-time formulation is more natural when considering measurements, which are usually taken at discrete time steps. If we consider the autonomous continuous-time dynamical system described by
+where $\vb{x}_0$ is a given initial condition. We are interested in analyzing the system's behaviour from its trajectories $\vb{x}_0, \vb{x}_1, \vb{x}_2,...$, or, more in general, measurements of these trajectories collected through data. Observe that the discrete-time formulation is more natural when considering measurements, which are usually taken at discrete time steps. If we consider the autonomous continuous-time dynamical system described by
 \begin{equation*}
     \frac{d}{dt}\vb{x}(t) = \vb{f}(\vb{x}(t)),
 \end{equation*}
@@ -14,18 +14,18 @@ then sampling the trajectories with time steps $\Delta t$ we are back to the for
     \vb{x}(t+\Delta t) = \vb{F}_{\Delta t}(\vb{x}(t)), \qquad \vb\vb{F}_{\Delta t}(\vb{x}(t)) = \vb{x}(t) + \int_{t}^{t+\Delta t}{\vb{f}(\vb{x}(\tau)) d\tau}.
 \end{equation}
 
-The classical approach to the study of dynamical systems is the geometric one, originated by the work of Poincaré \cite{henri_poincare_les_1899}. However, this geometric viewpoint, based on fixed points, local behaviours and invariant manifolds, is ill-suited to many real-world applications \cite{budisic_applied_2012}. As pointed out in \cite{colbrook_rigorous_2021}, the fundamental challenges of Poincaré's approach in a data-driven perspective are two: non-linear dynamics, for which the geometric viewpoints provides good trajectories approximations only locally and not for all initial conditions, and unknown dynamics. The latter case typically arises when the system's dynamic is too complex to describe analytically or partially unknown, and we have only access to experimental data related to sequences of iterates sampled starting from different initial conditions. Koopman Operator theory \cite{koopman_dynamical_1932, koopman_hamiltonian_1931} provides an alternative viewpoint, which is a general framework for connecting data and measurements to the state space of a dynamical system \cite{arbabi_introduction_2018}.
+The classical approach to the study of dynamical systems is the geometric one, originated by the work of Poincaré \cite{henri_poincare_les_1899}. However, this geometric viewpoint, based on fixed points, local behaviours and invariant manifolds, is ill-suited to many real-world applications \cite{budisic_applied_2012}. As pointed out in \cite{colbrook_rigorous_2021}, the fundamental challenges of Poincaré's approach in a data-driven perspective are two: non-linear dynamics, for which the geometric viewpoints provides good trajectories approximations only locally and not for all initial conditions, and unknown dynamics. The latter case typically arises when the system's dynamic is too complex to be analytically described or partially unknown, and we have only access to experimental data related to sequences of iterates sampled starting from different initial conditions. Koopman Operator theory \cite{koopman_dynamical_1932, koopman_hamiltonian_1931} provides an alternative viewpoint, which is a general framework for connecting data and measurements to the state space of a dynamical system \cite{arbabi_introduction_2018}.
 \subsection{Paper structure}
 In this first chapter, we introduce the Koopman Operator and its spectral properties, analysing in details the case of linear dynamical systems. In \Cref{chapter_dmd} we introduce Dynamic Mode Decomposition (DMD), we link it to the Arnoldi method in the case of linear dynamical systems, and we present how it can be extended to the general case of nonlinear dynamics. In \Cref{chapter_edmd} we present Extended Dynamic Mode Decomposition (EDMD) for computing spectral properties of the Koopman Operator, discussing the spectral pollution problem and introducing the Residual Dynamic Mode Decomposition (ResDMD) algorithm for removing spectral pollution and approximating the pseudospectrum of the Koopman Operator. We also reproduce some of the numerical examples in \cite{colbrook_rigorous_2021}. Finally, in \Cref{chapter_kedmd} we present a kernel-based approach for dynamical systems with high dimensional data, analysing experimentally possible applications also to low dimensional data.
 
 \section{Definition of the Koopman Operator}
-When dealing with real-world applications, especially when the dynamics are unknown, the state of the dynamical system is indirectly measured through data, which are variables related to the system's state. We can mathematically formulate this assuming that data is evaluations of functions of the states, leading to the following definition.
+When dealing with real-world applications, especially when the dynamics are unknown, the state of the dynamical system is indirectly measured through data, which are variables related to the system's state. We can mathematically formulate this fact by assuming that data are evaluations of functions of the states, leading to the following definition.
 
 \begin{definition}[Observable]
 A function $g:\Omega\to\C$ used to indirectly measure the state of the dynamical system is called an observable. 
 \end{definition}
 
-Our goal is to be able to approximate as accurately as possible the dynamics of the system. To do so from experimental data, i.e. from measurements, we need to understand how the observables evolve over time and here is where the Koopman Operator comes into play. The Koopman Operator advances the measurement forward in time by one-time step: it takes the state, advances the system by one-time step and measures the system again. Given an observable $g:\Omega\to\C$, we define $[\mathcal{K}g](\vb{x}) = g(\vb{F}(\vb{x}))$. It is typical to define the Koopman Operator on (a subset of) the Hilbert space $L^2(\Omega, \omega)$, where $\omega$ is a positive measure on the state-space (in our examples we will use only the Lebesgue measure).
+Our goal is to be able to approximate as accurately as possible the dynamics of the system. To achieve such goal from experimental data, i.e. from measurements, we need to understand how the observables evolve over time, and here is where the Koopman Operator comes into play. The Koopman Operator advances the measurement forward in time by one-time step: it takes the state, advances the system by one-time step and measures the system again. Given an observable $g:\Omega\to\C$, we define $[\mathcal{K}g](\vb{x}) = g(\vb{F}(\vb{x}))$. It is typical to define the Koopman Operator on (a subset of) the Hilbert space $L^2(\Omega, \omega)$, where $\omega$ is a positive measure on the state-space (in our examples we will use only the Lebesgue measure).
 
 \begin{definition}[Koopman Operator]
 Let $\Omega$ be the state-space of the dynamical system described by $\vb{F}:\Omega\to\Omega$ and let $\omega$ be a positive measure on the state-space. Given a suitable domain of observables $\mathcal{D}(\mathcal{K}) \subseteq L^2(\Omega, \omega)$ we define the Koopman Operator as:
@@ -39,7 +39,7 @@ Let $\Omega$ be the state-space of the dynamical system described by $\vb{F}:\Om
 \end{equation} 
 \end{definition}
 
-We can think of the Koopman Operator as lifting the dynamics from the state space to the space of observables. From this lifting, we gain that, regardless of the linearity or nonlinearity of $\vb{F}$, the Koopman Operator is a linear operator and therefore, to understand the dynamics of the system, we can analyze the spectral properties of $\mathcal{K}$. However, the disadvantage is that the space of the observables is infinite-dimensional and $\mathcal{K}$ can have a continuous spectrum. 
+We can think of the Koopman Operator as lifting the dynamics from the state space to the space of observables. From this lifting, we gain that, regardless of the linearity or nonlinearity of $\vb{F}$, the Koopman Operator is a linear operator. Therefore, to understand the dynamics of the system, we can analyze the spectral properties of $\mathcal{K}$. However, the disadvantage is that the space of the observables is infinite-dimensional and $\mathcal{K}$ can have a continuous spectrum. 
 
 \section{Koopman eigenvalues, eigenfunctions and eigenmodes}
 
@@ -48,7 +48,7 @@ Since the definition of an eigenvalue-eigenfunction pair (abbr. \emph{eigenpair}
 Let $\phi_j:\Omega\to\Omega$ be an observable of the dynamical system and let $\lambda_j\in\C$. The pair $(\phi_j, \,\lambda_j)$ is called an eigenpair of the Koopman Operator $\mathcal{K}$ if $\mathcal{K}\phi_j = \lambda_j\phi_j$, i.e if $[\mathcal{K}\phi_j](\vb{x}) = \phi_j(\vb{F}(\vb{x})) = \lambda_j\phi_j(\vb{x})$.
 \end{definition}
 
-Observing that the composition of function is not only linear but also preserves the product, i.e. $(g_1 \cdot g_2) \circ f = (g_1 \circ f) \cdot (g_2 \circ f)$, it is straightforward that $\mathcal{K}(g_1\cdot g_2) = \mathcal{K}g_1\cdot \mathcal{K}g_2$. The following lemma is therefore trivial.
+Observing that the composition of function is not only linear but also preserves the product, i.e. $(g_1 \cdot g_2) \circ f = (g_1 \circ f) \cdot (g_2 \circ f)$, it is straightforward that $\mathcal{K}(g_1\cdot g_2) = \mathcal{K}g_1\cdot \mathcal{K}g_2$. The following lemma is, therefore, trivial.
 \begin{lemma}
 \label{eigenpair_multiplication}
 Let $(\phi_j, \,\lambda_j)$ and $(\phi_k, \,\lambda_k)$ be two not necessarily distinct eigenpairs of $\mathcal{K}$, such that the supports of $\phi_j$ and $\phi_k$ have an intersection with nonzero measure. Then also $(\phi_j\cdot\phi_k, \,\lambda_j\cdot\lambda_k)$ is an eigenpair of $\mathcal{K}$. In particular, given an eigenpair $(\phi, \,\lambda)$, also $(\phi^k, \,\lambda^k)$ is an eigenpair of $\mathcal{K}$ $\forall k\in\mathbb{N},\,\, k \geq 0$.
@@ -84,16 +84,16 @@ and the evolution of the system reads
 
 The decomposition in \eqref{decomposition_linear} is nothing more than an expansion of $\vb{x}$ as a linear combination of the vectors $\vb{v}_j$, where the $\phi_j(\vb{x})$ are the coefficients. However, from the Koopman Operator's viewpoint, it is a linear expansion of the (vector) full state observable as a linear combination of the eigenfunctions of $\mathcal{K}$, where now the role of the coefficients is played by the vectors $\vb{v}_j$ \cite{rowley_spectral_2009}. 
 
-The vectors $\vb{v}_j$ are called \emph{Koopman modes} with respect to the observable $g$, which in this case is the full state (vector) observable $g(\vb{x}) = \vb{x}$. They are not associated with the Koopman Operator itself, but rather with the action of $\mathcal{K}$ on a particular observable. For instance if we consider another linear observable $g(\vb{x}) = \vb*{C}\vb{x}$ where $\vb*{C}\in\R^{m \times d}$ then we obtain
+The vectors $\vb{v}_j$ are called \emph{Koopman modes} with respect to the observable $g$, which in this case is the full state (vector) observable $g(\vb{x}) = \vb{x}$. They are not associated to the Koopman Operator itself, but rather to the action of $\mathcal{K}$ on a particular observable. For instance, if we consider another linear observable $g(\vb{x}) = \vb*{C}\vb{x}$ where $\vb*{C}\in\R^{m \times d}$ then we obtain
 \begin{equation*}
 	[\mathcal{K}g](\vb{x}) = g(\vb*{A}\vb{x})  = \sum_{j=1}^d \lambda_j \phi_j(\vb{x}) \vb*{C}\vb{v}_j.
 \end{equation*}
 i.e. $\{\vb*{C}\vb{v}_j\}_{j = 1}^d$ are the new Koopman modes.
 
-We can therefore conclude that for linear dynamical systems with simple spectrum, the two formulations, the one using $\mathcal{K}$ and the one using $\vb*{F}$, are strictly linked. In particular, the full state observable can be expressed as a combination of eigenfunctions derived from the eigenvectors of $\vb*{A}^*$ and the Koopman modes coincide with the eigenvectors of $\vb*{A}$. 
+We can therefore conclude that for linear dynamical systems with simple spectrum, the two formulations, namely the one using $\mathcal{K}$ and the one using $\vb*{F}$, are strictly linked. In particular, the full state observable can be expressed as a combination of eigenfunctions derived from the eigenvectors of $\vb*{A}^*$, and the Koopman modes coincide with the eigenvectors of $\vb*{A}$. 
 
 \subsection{Linear systems: general case}
-The previous discussion can be generalized to the case of non-simple spectrum \cite{mezic_spectrum_2019}, i.e. $\vb*{A}$ non-diagonalizable, defining generalized eigenfunctions strictly linked with the generalized eigenvectors of $\vb*{A}$.
+The previous discussion can be generalized to the case of non-simple spectrum \cite{mezic_spectrum_2019}, i.e. $\vb*{A}$ non-diagonalizable, defining generalized eigenfunctions strictly linked to the generalized eigenvectors of $\vb*{A}$.
 \begin{definition}
 \label{gen_eigenfunction_def}
 Let $\vb{A}\in\R^{d\times d}$ be a matrix with canonical Jordan form:
@@ -187,7 +187,7 @@ Let $\vb*{A}\in\R^{d\times d}$ be a matrix and let $\mu_1, \dots, \mu_p$ be its 
 \begin{equation*}
     [\mathcal{K}\vb{g}](\vb{x}) = \sum_{j = 1}^{p} \left(\mu_j P_j(\vb{x}) + D_j(\vb{x}) \right)
 \end{equation*}
-where $P_j$ is the projection onto the algebraic eigenspace associated with $\mu_j$, which is defined as the null space of $(\vb*{A} - \mu_j\vb*{I})^{\mathrm{ma}_j}$, and $D_j$ is a nilpotent operator of order equal to the maximum size of the Jordan blocks corresponding to the eigenvalue $\mu_j$. 
+where $P_j$ is the projection onto the algebraic eigenspace associated to $\mu_j$, which is defined as the null space of $(\vb*{A} - \mu_j\vb*{I})^{\mathrm{ma}_j}$, and $D_j$ is a nilpotent operator of order equal to the maximum size of the Jordan blocks corresponding to the eigenvalue $\mu_j$. 
 \end{corollary}
 \begin{proof}
 From \Cref{prop_decomposition_jordan}, supposing that $\mu_j = \lambda_{h_1} = \dots = \lambda_{h_r}$ and $\mu_j \neq \lambda_{h}$ for $h\notin\{h_1,\dots, h_r\}$, we can define:
@@ -197,7 +197,7 @@ From \Cref{prop_decomposition_jordan}, supposing that $\mu_j = \lambda_{h_1} = \
         D_j &= \sum_{i=1}^r D_{h_i}.
     \end{split}
 \end{equation*}
-Then $P_j$ is the projection onto the algebraic eigenspace associated with $\mu_j$ and $D_{h_i}$ are nilpotent operators with maxiumum order equal to the maximum size of the Jordan blocks corresponding to the eigenvalue $\mu_j$. Since $D_{h_i}D_{h_k} = 0$ if $i\neq k$, it holds
+Then $P_j$ is the projection onto the algebraic eigenspace associated to $\mu_j$, and $D_{h_i}$ are nilpotent operators with maximum order equal to the maximum size of the Jordan blocks corresponding to the eigenvalue $\mu_j$. Since $D_{h_i}D_{h_k} = 0$ if $i\neq k$, it holds
 \begin{equation*}
     D_j^k = \sum_{i=1}^r D_{h_i}^k
 \end{equation*}
