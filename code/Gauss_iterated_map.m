@@ -175,7 +175,7 @@ for k = keySet
     loglog(Ms, errors(key), 'LineWidth', 1.5, 'Displayname', key);
     hold on
 end
-legend('Location','east', 'AutoUpdate','off')
+legend('Location','east', 'AutoUpdate','off', 'Interpreter','latex', FontSize=12)
 
 Ms = Ms(Ms > 1000);
 legend_index = round(length(Ms)/2);
