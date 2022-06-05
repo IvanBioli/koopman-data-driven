@@ -19,7 +19,7 @@ We aim at generating $\vb*{K}\in\C^{k\times k}$ finite dimensional approximation
     \label{k_finite_dimensional}
     \mathcal{K}\vb{\phi} = (\Psi \circ \vb{F})\vb{a} = \Psi\vb*K\vb{a} + r
 \end{equation}
-where the residual term $r = r(\vb{a}, \vb{x})$ is due to the fact that in general $\Span(\mathcal{D})$ is not $\mathcal{K}$-invariant. To obtain the "best" $\vb*{K}\in\C^{K\times K}$ it is natural to minimize the norm of the point-wise maximum of the residual of all possible $\phi\in\Span(\mathcal{D})$, i.e to solve the following problem \cite{colbrook_rigorous_2021}:
+where the residual term $r = r(\vb{a}, \vb{x})$ is due to the fact that, in general, $\Span(\mathcal{D})$ is not $\mathcal{K}$-invariant. To obtain the "best" $\vb*{K}\in\C^{K\times K}$ it is natural to minimize the norm of the point-wise maximum of the residual of all possible $\phi\in\Span(\mathcal{D})$, i.e to solve the following problem \cite{colbrook_rigorous_2021}:
 \begin{equation}
     \label{edmd_integral_problem}
     \argmin_{\vb*{K}\in\C^{K\times K}}\int_{\Omega} \max_{\vb{a}\in\C^k \\ \norm{\vb{a}} = 1}\abs{r(\vb{a}, \vb{x})}^2 d\omega(\vb{x}) = 
@@ -63,7 +63,7 @@ Observe that the matrices involved in the computations are
         \Psi_0^*\vb*{W}\Psi_1 & = \sum_{j=1}^M w_j \Psi(\vb{x}_0^{(j)})^* \Psi(\vb{x}_1^{(j)}).
     \end{split}
 \end{equation*}
-This rewriting is particularly advantageous when the number of snapshots is much larger than the size of the dictionary, i.e. $M >> K$, because each term of the sum can be computed individually and the products in \eqref{psi_rewriting} can be built iteratively, without the need of explicitly storing the matrices $\Psi_0,\,\Psi_1\in\C^{M\times K}$.
+This rewriting is particularly advantageous when the number of snapshots is much larger than the size of the dictionary, i.e. $M >> K$, because each term of the sum can be computed individually, and the products in \eqref{psi_rewriting} can be built iteratively, without the need of explicitly storing the matrices $\Psi_0,\,\Psi_1\in\C^{M\times K}$.
 
 To approximate the eigenvalue-eigenfunction pair of the Koopman Operator, we use the eigenpairs of its finite dimensional approximation $\vb*{K}$. If $\lambda_j$ is an eigenvalue of $\vb*{K}$ with eigenvector $\bm{\xi}_j$, an approximation of an eigenvalue-eigenfunction pair of $\mathcal{K}$ is $(\lambda_j, \phi_j = \Psi\bm{\xi}_j)$.
 
@@ -89,7 +89,7 @@ Let us consider the full state observable
     \vb{e}_d^*\vb{x}
     \end{bmatrix} = \vb{x}.
 \end{equation}
-Let us assume that $g_i\in\Span(\mathcal{D})$ for all $i = 1,\dots,d$. If this is not the case an intermediate step to project $g_i$ onto $\Span(\mathcal{D})$ is required, with the accuracy strongly depending on the choice of the dictionary. If $g_i\in\Span(\mathcal{D})$ we can write
+Let us assume that $g_i\in\Span(\mathcal{D})$ for all $i = 1,\dots,d$. If this is not the case, an intermediate step to project $g_i$ onto $\Span(\mathcal{D})$ is required, with an accuracy strongly dependent on the choice of the dictionary. If $g_i\in\Span(\mathcal{D})$ we can write
 \begin{equation}
     g_i = \sum_{k=1}^K b_{ki}\psi_k = \Psi\vb{b}_i
 \end{equation}
@@ -103,7 +103,7 @@ Let $\bm{\Xi} = \left[\bm{\xi}_1,\dots,\bm{\xi}_K\right]$ be the matrix of the e
 \begin{equation}
     \vb{g} = \vb*{B}^T\Psi^T = \vb*{B}^T(\bm{\Xi}^T)^{-1}\Phi^T = (\bm{\Xi}^{-1}\vb*{B})^T\Phi^T.
 \end{equation}
-Since $\bm{\Xi}$ is the matrix of the eigenvectors of $\vb*{K}$, its inverse is $\bm{\Xi}^{-1} = \left[\vb{u}_1, \dots, \vb{u}_K\right]$ where $\vb{u}_i$ is the left eigenvector of $\vb*{K}$ also associated with $\lambda_i$ and appropriately scaled so that $\vb{u}_i^*\bm{\xi}_j = \delta_{ij}$. We can therefore compute the left eigenvectors of $\vb*{K}$ and letting  $\vb*{V} = (\vb*{U}^*\vb*{B})^T$, then
+Since $\bm{\Xi}$ is the matrix of the eigenvectors of $\vb*{K}$, its inverse is $\bm{\Xi}^{-1} = \left[\vb{u}_1, \dots, \vb{u}_K\right]$, where $\vb{u}_i$ is the left eigenvector of $\vb*{K}$ also associated with $\lambda_i$ and appropriately scaled so that $\vb{u}_i^*\bm{\xi}_j = \delta_{ij}$. We can therefore compute the left eigenvectors of $\vb*{K}$ and letting  $\vb*{V} = (\vb*{U}^*\vb*{B})^T$, then
 \begin{equation}
     \vb{g} = \vb*{V}\Psi^T = \sum_{k=1}^K \vb{v}_k\psi_k,
 \end{equation}
@@ -115,7 +115,7 @@ In conclusion, as summarized in \Cref{alg_edmd},  once we have computed the fini
     \item the right eigenvectors of $\vb*{K}$ generate the approximation of the eigenfunctions;
     \item the left eigenvectors of $\vb*{K}$ generate the approximation of the Koopman modes.
 \end{itemize}
-If we are interested in an approximation of only a leading subset of eigenvalues, instead of a complete eigendecomposition of the matrix $\vb*{K}$ Krylov methods or other iterative methods might be considered to efficiently compute only the leading eigenpairs of $\vb*{K}$.
+If we are interested in an approximation of only a leading subset of eigenvalues, instead of a complete eigendecomposition of the matrix $\vb*{K}$, Krylov methods or other iterative methods might be considered to efficiently compute only the leading eigenpairs of $\vb*{K}$.
 
 \begin{algorithm}
 \caption{\textbf{: Extended Dynamic Mode Decomposition (EDMD)}}
@@ -138,7 +138,7 @@ If we are interested in an approximation of only a leading subset of eigenvalues
 
 \section{Spectral pollution and Residual DMD (ResDMD)}
 \label{section_resdmd}
-To compute the eigenvalues of the Koopman Operator, we approximate the infinite-dimensional operator $\mathcal{K}$ by a finite matrix. Therefore, even if some of the eigenvalues produced by the EDMD algorithm are reliable, most of them are not. \emph{Pseudospectra} \cite{trefethen_spectra_2005} are a tool that allow us to detect this so called \emph{spectral pollution} \cite{colbrook_rigorous_2021}, i.e. spurious eigenvalues of the matrix $\vb*{K}$ that are only due to the discretization and have no connection with the latent Koopman Operator.
+In order to compute the eigenvalues of the Koopman Operator, we approximate the infinite-dimensional operator $\mathcal{K}$ by a finite matrix. Therefore, even if some of the eigenvalues produced by the EDMD algorithm are reliable, most of them are not. \emph{Pseudospectra} \cite{trefethen_spectra_2005} are a tool that allow us to detect this so-called \emph{spectral pollution} \cite{colbrook_rigorous_2021}, i.e. spurious eigenvalues of the matrix $\vb*{K}$ that are only due to the discretization and have no connection with the latent Koopman Operator.
 
 \begin{definition}[Pseudospectrum of a square matrix]
 Given a matrix $\vb*{A}\in\C^{n\times n}$ and $\varepsilon > 0$, the $\varepsilon$-pseudospectrum of $\vb*{A}$ is defined as
@@ -179,7 +179,7 @@ The \emph{Residual DMD} (ResDMD) algorithm performs the same steps of EDMD, but 
         & = \frac{\sum_{j,k = 1}^K \overline{\xi}_j\xi_k \left( \langle\mathcal{K}\psi_k, \mathcal{K}\psi_j\rangle - \lambda \langle\psi_k, \mathcal{K}\psi_j\rangle - \overline{\lambda}\langle\mathcal{K}\psi_k, \psi_j\rangle + \abs{\lambda}^2 \langle\psi_k, \psi_j\rangle\right)}{\sum_{j,k = 1}^K \overline{\xi}_j\xi_k \langle\psi_k, \psi_j\rangle}.
     \end{split}
 \end{equation}
-Once again, this integral cannot be computed exactly and to approximate it we use the same quadrature rule used to approximate \eqref{edmd_integral_problem}. Hence:
+Once again, this integral cannot be computed exactly, and to approximate it we use the same quadrature rule used to approximate \eqref{edmd_integral_problem}. Hence:
 \begin{equation}
     \label{residual_approx}
     \begin{split}
@@ -206,7 +206,7 @@ If $\widetilde{\mathrm{res}}(\lambda, \phi) > \varepsilon$, the eigenpair $(\lam
 \textbf{Output:} Approximation of the eigenvalues ($\lambda_j$), eigenfunctions ($\phi_j$) with $\widetilde{\mathrm{res}}(\lambda_j, \phi)_j < \varepsilon$
 \end{algorithm}
 
-The above-described cleanup procedure avoids spectral pollution and if the quadrature converges, in the large data limit, removes eigenpairs with a residual above the prescribed tolerance $\varepsilon$ and retains only eigenpairs that are inside the $\varepsilon$-pseudospectrum of $\mathcal{K}$. This is precised in the following proposition.
+The above-described cleanup procedure avoids spectral pollution and, if the quadrature converges, in the large data limit, removes eigenpairs with a residual above the prescribed tolerance $\varepsilon$ ,and retains only eigenpairs that are inside the $\varepsilon$-pseudospectrum of $\mathcal{K}$. This is precised in the following proposition.
 \begin{prop}[\cite{colbrook_rigorous_2021}, Theorem 4.1]
 Assume that the quadrature rule converges, i.e. that
 \begin{equation*}
@@ -221,7 +221,7 @@ Let us denote by $\Lambda$ the eigenvalues in the output of \Cref{alg_resdmd}, t
 \end{prop}
 
 \subsection{ResDMD to approximate the pseudospectrum}
-In spite of the fact that the eigenvalues returned by \Cref{alg_resdmd} lie in the $\varepsilon$-pseudospectrum (in the large data limit), the eigenvalues of $\vb*{K}$ might not approximate the whole spectrum of $\mathcal{K}$ and therefore it might not be possible to approximate the whole $\varepsilon$-pseudospectrum of $\mathcal{K}$ using \Cref{alg_resdmd}. A simple modification of \Cref{alg_resdmd} allows us to draw an approximation of the $\varepsilon$-pseudospectrum of $\mathcal{K}$ starting from a grid of points in the complex plane. Given a point $z_j\in\C$ on a grid, we search the function $\psi_j$ in $\Span(\mathcal{D})$ that minimizes $\mathrm{res}(z_j, \psi_j)$, i.e. we solve
+In spite of the fact that the eigenvalues returned by \Cref{alg_resdmd} lie in the $\varepsilon$-pseudospectrum (in the large data limit), the eigenvalues of $\vb*{K}$ might not approximate the whole spectrum of $\mathcal{K}$ and, therefore, it might not be possible to approximate the whole $\varepsilon$-pseudospectrum of $\mathcal{K}$ using \Cref{alg_resdmd}. A simple modification of \Cref{alg_resdmd} allows drawing an approximation of the $\varepsilon$-pseudospectrum of $\mathcal{K}$ starting from a grid of points in the complex plane. Given a point $z_j\in\C$ on a grid, we search the function $\psi_j$ in $\Span(\mathcal{D})$ that minimizes $\mathrm{res}(z_j, \psi_j)$, i.e. we solve
 \begin{equation}
     \label{grid_continuous}
     \tau_j = \min_{\vb{g}\in\C^K} \mathrm{res}(z_j, \Psi\vb{g}), \qquad \vb{g}_j = \argmin_{\vb{g}\in\C^K} \mathrm{res}(z_j, \Psi\vb{g}).
@@ -254,14 +254,14 @@ The matrices $(\Psi_0^*\vb*{W}\Psi_0)$ and $\vb*{D}(z_j)$ are hermitian positive
 \textbf{Output:} Estimate of the $\varepsilon$-pseudospectrum $\{z_j\,:\,\tau_j < \varepsilon\}$ and corresponding approximate eigenfunctions $\{\vb{g}_j\,:\,\tau_j < \varepsilon\}$. 
 \end{algorithm}
 
-The following proposition allows to rewrite the pseudospectrum approximation provided by \Cref{alg_pseudospectrum} as the pseudospectrum either of a rectangular matrix pencil or of a rectangular matrix.
+The following proposition allows rewriting the pseudospectrum approximation provided by \Cref{alg_pseudospectrum} as the pseudospectrum either of a rectangular matrix pencil or of a rectangular matrix.
 \begin{prop}
 \label{prop_pseudospectrum}
 Let us assume that $\Psi_0$ has full column rank and let us consider the singular value decomposition $\sqrt{\vb*{W}}\Psi_0 = \vb*{U}\bm{\Sigma}\vb*{V}$, where $\vb*{U}\in\C^{M\times K}$ and $\bm{\Sigma},\vb*{V}\in\C^{K\times K}$. Then the approximation of the pseudospectrum of the Koopman operator provided by \Cref{alg_pseudospectrum} coincides with the pseudospectrum of the rectangular matrix pencil
 \begin{equation}
     \sqrt{\vb*{W}}\Psi_1 \vb*{V}\bm{\Sigma}^{-1} - \lambda\vb*{U}.
 \end{equation}
-Moreover if the columns of $\vb*{U}_{\perp}$ complete the columns of $\vb*{U}$ to an orthonormal basis of $\C^{M}$, then the pseudospectrum approximation coincides also with the pseudospectrum of the rectangular matrix
+Moreover, if the columns of $\vb*{U}_{\perp}$ complete the columns of $\vb*{U}$ to an orthonormal basis of $\C^{M}$, then the pseudospectrum approximation coincides also with the pseudospectrum of the rectangular matrix
 \begin{equation}
     \begin{bmatrix}
     \vb*{U}^*\sqrt{\vb*{W}}\Psi_1 \vb*{V}\bm{\Sigma}^{-1}\\
@@ -288,9 +288,9 @@ where from \eqref{D(z)_definition} we can write $\vb*{C}(z) = \sqrt{\vb*{W}}(\Ps
         &= \sigma_{\min}(\sqrt{\vb*{W}}(\Psi_1 - z\vb*{U}\bm{\Sigma}\vb*{V}^*)\vb*{V}\bm{\Sigma}^{-1}) = \sigma_{\min}(\sqrt{\vb*{W}}\Psi_1\vb*{V}\bm{\Sigma}^{-1} - z\vb*{U})
     \end{split}
 \end{equation*}
-from which follows the first statement. 
+from which the first statement follows. 
 
-Moreover $\vb*{Q} = [\vb*{U}\,\lvert\,\vb*{U}_\perp]$ is an unitary matrix, hence multiplying by $Q$ on the left the singular values are preserved, yielding:
+Moreover $\vb*{Q} = [\vb*{U}\,\lvert\,\vb*{U}_\perp]$ is a unitary matrix, hence multiplying by $Q$ on the left the singular values are preserved, yielding:
 \begin{equation*}
     \begin{split}
         \sigma_{\min}(\vb*{C}(z)) &= \sigma_{\min}(\vb*{Q}^*\sqrt{\vb*{W}}\Psi_1\vb*{V}\bm{\Sigma}^{-1} - z\vb*{Q}^*\vb*{U}) = \\
@@ -306,13 +306,15 @@ Moreover $\vb*{Q} = [\vb*{U}\,\lvert\,\vb*{U}_\perp]$ is an unitary matrix, henc
         \right).
     \end{split}
 \end{equation*}
-Finally one can write the upper part of the matrix as:
+Finally, one can write the upper part of the matrix as:
 \begin{equation*}
     \vb*{U}^*\sqrt{\vb*{W}}\Psi_1 \vb*{V}\bm{\Sigma}^{-1} = \bm{\Sigma} \vb*{V}^* \vb*{V}\bm{\Sigma}^{-1}\vb*{U}^*\sqrt{\vb*{W}}\Psi_1 \vb*{V}\bm{\Sigma}^{-1} = \bm{\Sigma}\vb{V}^*(\Psi_0^\dagger \Psi_1)\vb{V}\bm{\Sigma}^{-1}.
 \end{equation*}
 \end{proof}
 
 From the previous rewriting, one can use standard techniques for the computation of pseudospectra of rectangular matrices \cite{wright_pseudospectra_2002}, as long as $M$ is not too big. Observe indeed that the matrix pencil in \Cref{prop_pseudospectrum} is of size $M\times K$, while the generalized eigenvalue problems in \Cref{alg_pseudospectrum} involve matrices of size $K\times K$.
+
+\newpage
 
 \section{Numerical Examples}
 \label{section_experiments}
@@ -325,14 +327,14 @@ The Gauss iterated map is a function $F:\R\to\R$ defined by $F(x) =\exp(\alpha x
     \item Gauss-Legendre: $\{\vb{x}_0^{(m)}\}_{m = 1}^M$ are the Gauss-Legendre quadrature nodes transplanted to the interval $\Omega$, with $\{w_m\}_{m = 1}^M$ the corresponding quadrature weights.
     \item Trapezoidal: $\vb{x}_0^{(m)} = -1 + \frac{m-1}{M-1}$, with $w_m = \frac{1}{M-1},\,\,m = 2,\dots, M-1$ and $w_1 = w_M = \frac{1}{2(M-1)}$.
     \item Riemann sum: $\vb{x}_0^{(m)} = -1 + \frac{m-1}{M-1}$, with $w_m = \frac{1}{M-1},\,\,m = 1,\dots, M$.
-    \item Montecarlo: $\{\vb{x}_0^{(m)}\}_{m = 1}^M$ are chosen uniformly at random in over the interval $\Omega$, with $w_m = \frac{1}{M-1},\,\,m = 1,\dots, M$. 
+    \item Montecarlo: $\{\vb{x}_0^{(m)}\}_{m = 1}^M$ are chosen uniformly at random over the interval $\Omega$, with $w_m = \frac{1}{M-1},\,\,m = 1,\dots, M$. 
 \end{itemize}
 
-\Cref{fig_resdmd_quadrature_comparison} shows the approximations of the eigenvalues of the Koopman Operator computed using DMD, EDMD and ResDMD for each of the four quadrature rules. \Cref{gauss_pseudospectrum_convergence} shows the approximation of the $\varepsilon$-pseudospectrum for $\varepsilon = 0.3,\,0.1,\,0.01,\,0.001$ computed using \Cref{alg_pseudospectrum} and the convergence of the different quadrature rules measured as $\max_{1\leq j,k \leq K} \abs{(\Psi_0^* W \Psi_1)_{jk} - \langle\mathcal{K}\psi_k, \psi_j\rangle}$.
+\Cref{fig_resdmd_quadrature_comparison} shows the approximations of the eigenvalues of the Koopman Operator computed using DMD, EDMD and ResDMD for each of the four quadrature rules. \Cref{gauss_pseudospectrum_convergence} shows the approximation of the $\varepsilon$-pseudospectrum for $\varepsilon = 0.3,\,0.1,\,0.01,\,0.001$ computed using \Cref{alg_pseudospectrum}, and the convergence of the different quadrature rules measured as $\max_{1\leq j,k \leq K} \abs{(\Psi_0^* W \Psi_1)_{jk} - \langle\mathcal{K}\psi_k, \psi_j\rangle}$.
 
-It can be seen that for the Montecarlo and the Riemann Sums quadrature rules, which use the same weights for all quadrature points, EDMD and DMD compute the same eigenvalues (magenta dots and green pluses overlap in \Cref{fig_resdmd_quadrature_comparison}). The outputs of the two algorithms are slightly dissimilar for the Trapezoidal rule, which changes the weights only at the extremes, while they significantly differ for the Gauss-Legendre rule.
+It can be seen that, for the Montecarlo and the Riemann Sums quadrature rules, which use the same weights for all quadrature points, EDMD and DMD compute the same eigenvalues (magenta dots and green pluses overlap in \Cref{fig_resdmd_quadrature_comparison}). The outputs of the two algorithms are slightly dissimilar for the Trapezoidal rule, which changes the weights only at the extremes, while they significantly differ for the Gauss-Legendre rule.
 
-The convergence rates are in agreement with standard theoretical results on numerical integration \cite{quarteroni_numerical_2007}, with the Gauss-Legendre quadrature converging exponentially and the other quadrature rules polynomially. It can be understood that if one has the possibility of choosing the initial condition of the snapshot data, selecting them wisely can make the discretized problem significantly closer to the continuous one. This has a strong impact also on the accuracy of the eigenvalues computed using \Cref{alg_resdmd}. Indeed, the more accurate is the computation of the residual's integral, the more eigenvalues can be removed due to a too high residual, as shown in \Cref{fig_resdmd_quadrature_comparison}.
+The convergence rates are in agreement with standard theoretical results on numerical integration \cite{quarteroni_numerical_2007}, with the Gauss-Legendre quadrature converging exponentially and the other quadrature rules polynomially. It can be understood that, if one has the possibility of choosing the initial condition of the snapshot data, selecting them wisely can make the discretized problem significantly closer to the continuous one. This has a strong impact also on the accuracy of the eigenvalues computed using \Cref{alg_resdmd}. Indeed, the more accurate is the computation of the residual's integral, the more eigenvalues can be removed due to a too high residual, as shown in \Cref{fig_resdmd_quadrature_comparison}.
 
 \begin{figure}[h]
 \centering
@@ -383,7 +385,7 @@ Let us consider the continous-time dynamical system of the nonlinear pendulum. T
 \end{equation}
 We consider the corresponding discrete-time dynamical system with time-step $\Delta_t = 0.5$ and the associated Koopman Operator. The system is Hamiltonian and hence the Koopman Operator is unitary \cite{koopman_hamiltonian_1931}.
 
-The choice of the dictionary of observables is now more complex, because the function governing the motion is vector-valued (with two components) and periodic in the first component. Since the motion is periodic in $x_1\in[-\pi,\pi]_{\text{per}}$, it is natural to use the Fourier basis $\{e_n\}_{n\in\mathbb{Z}}$ in $x_1$ to describe the motion in this direction. Similarly, to approximate the motion in the direction of $x_2$ one might decide to use the Hermite functions $\{h_n\}_{n\in\mathbb{N}}$, which form a basis of the Hilbert space $L^2(\R)$. Therefore, we would ideally consider observables of the form $\phi(x_1, x_2) = \sum_{n\in\mathbb{Z},\,m\in\mathbb{N}} \alpha_{n,m} e_n(x_1)\cdot h_m(x_2)$ for some coefficients $\{\alpha_{n,m}\}\in\C$. However, our dictionary of observables must be finite and we need to decide a criterion to truncate the sum. Observe that there isn't a natural ordering as if the indices were in $\mathbb{N}$ or $\mathbb{Z}$. Since we want to be able to approximate the (components of the) full state observable, it is important to have the indices $\{(n,0)\}_{n=0}^{n_{\max}}$ and $\{(0,m)\}_{m=-m_{\max}}^{m_{\max}}$ with $n_{\max},\,m_{\max}$ as high as possible. Selecting the indices in the rectangle $\{(n,m)\,:\,-n_{\max}\leq n\leq n_{\max},\,\, 0\leq m\leq m_{\max}\}$ would make the size of the dictionary grow too fast in $n_{\max}$ and $m_{\max}$, thus we use an hyperbolic cross approximation \cite{dung_hyperbolic_2017}, i.e. we select the indices in the hyperbolic cross $\{(n,m)\,:\, \max(n,1)\cdot \max(m,1)\leq N \}$, where $N$ is called the order of the hyperbolic cross approximation.
+The choice of the dictionary of observables is now more complex, because the function governing the motion is vector-valued (with two components) and periodic in the first component. Since the motion is periodic in $x_1\in[-\pi,\pi]_{\text{per}}$, it is natural to use the Fourier basis $\{e_n\}_{n\in\mathbb{Z}}$ in $x_1$ to describe the motion in this direction. Similarly, to approximate the motion in the direction of $x_2$ one might decide to use the Hermite functions $\{h_n\}_{n\in\mathbb{N}}$, which form a basis of the Hilbert space $L^2(\R)$. Therefore, we would ideally consider observables of the form $\phi(x_1, x_2) = \sum_{n\in\mathbb{Z},\,m\in\mathbb{N}} \alpha_{n,m} e_n(x_1)\cdot h_m(x_2)$ for some coefficients $\{\alpha_{n,m}\}\in\C$. However, our dictionary of observables must be finite and we need to decide a criterion to truncate the sum. Observe that there is not a natural ordering, such as if the indices were in $\mathbb{N}$ or $\mathbb{Z}$. Since we want to be able to approximate the (components of the) full state observable, it is important to have the indices $\{(n,0)\}_{n=0}^{n_{\max}}$ and $\{(0,m)\}_{m=-m_{\max}}^{m_{\max}}$ with $n_{\max},\,m_{\max}$ as high as possible. Selecting the indices in the rectangle $\{(n,m)\,:\,-n_{\max}\leq n\leq n_{\max},\,\, 0\leq m\leq m_{\max}\}$ would make the size of the dictionary grow too fast in $n_{\max}$ and $m_{\max}$. Therefore, we use an hyperbolic cross approximation \cite{dung_hyperbolic_2017}, i.e. we select the indices in the hyperbolic cross $\{(n,m)\,:\, \max(n,1)\cdot \max(m,1)\leq N \}$, where $N$ is called the order of the hyperbolic cross approximation.
 
 Using \Cref{alg_pseudospectrum} we compute an approximation of the $\varepsilon$-pseudospectrum for $\varepsilon = 0.25$, first using $K=193$ observables and $M = 10^4$ data points, then employing $K=1265$ and $M = 9 \times 10^4$. As the size $K$ of the dictionary increases, the approximation of the $\varepsilon$-pseudospectrum approaches the annulus with internal radius 0.75 and external radius 1.25(see \Cref{pendulum_pseudospectrum}). We also compute approximation of the eigenfunctions associated with the eigenvalues $\lambda = \exp(0.4932 i), \,\lambda = \exp(0.9765 i), \,\lambda = \exp(1.4452 i), \,\lambda = \exp(1.8951 i), \,$ (see \Cref{pendulum_phase_portraits}).
 
