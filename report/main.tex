@@ -36,7 +36,7 @@
 
 \begin{abstract}
 \thispagestyle{empty}
-TO DO
+When dealing with dynamical systems with discrete time steps, nonlinear and unknown dynamics pose challenges to the standard Poincaré's approach. Koopman operators are infinite-dimensional operators that linearize the dynamics by lifting it to the observables state space. We review spectral properties of Koopman operators, focusing in particular on the case of linear dynamics, as well as numerical methods for computing spectral information of the Koopman operator from snapshot data. We also examine the problem of spectral pollution, recalling Residual Dynamic Mode Decomposition (ResDMD) and proving a proposition that allows reducing ResDMD to a standard matrix pseudospectrum approximation problem. Numerical examples from \cite{colbrook_rigorous_2021} are reproduced. Finally, a two step procedure for extracting a dictionary of observables directly from snapshot data and a general-purpose kernel is introduced. 
 \end{abstract}
 
 \clearpage
@@ -60,7 +60,9 @@ TO DO
 \input{kedmd}
 
 \chapter{Conclusions}
-Starting from the article \cite{colbrook_rigorous_2021} by Colbrook and Townsend, we analysed spectral properties of the Koopman Operator and discussed methods to numerically compute spectral approximations. Dynamic Mode Decomposition was presented, with a particular focus on the case of linear dynamical systems, where DMD is mathematically equivalent to the Arnoldi algorithm but less stable from a numerical point of view. For nonlinear dynamics, the EDMD algorithm was proposed, and its variant ResDMD was used to both deal with the problem of spectral pollution and approximate the pseudospectrum of the Koopman Operator. Furthermore, a proposition linking the pseudospectral approximation returned by ResDMD and the pseudospectrum of a particular matrix pencil was proven in this work. Two numerical examples from Section 4 of \cite{colbrook_rigorous_2021} were reproduced in details: the Gauss iterated map and the nonlinear pendulum. Finally, the kernelized approach proposed in \cite{colbrook_rigorous_2021} for high dimensional data was used to create a data-driven dictionary for the Gauss iterated map problem to show a possible way of avoiding the step of hand-crafting a problem-dependent dictionary for the EDMD and ResDMD algorithms.
+Starting from the article \cite{colbrook_rigorous_2021} by J. Colbrook and A. Townsend, we analysed spectral properties of the Koopman Operator and discussed methods to numerically compute spectral approximations. Dynamic Mode Decomposition was presented, with a particular focus on the case of linear dynamical systems, where DMD is mathematically equivalent to the Arnoldi algorithm, but less stable from a numerical point of view. For nonlinear dynamics, the EDMD algorithm was proposed, and its variant ResDMD was used to both deal with the problem of spectral pollution and approximate the pseudospectrum of the Koopman Operator. Furthermore, a proposition linking the pseudospectral approximation returned by ResDMD and the pseudospectrum of a particular matrix pencil was proven in this work. Two numerical examples from Section 4 of \cite{colbrook_rigorous_2021} were reproduced in details: the Gauss iterated map and the nonlinear pendulum. 
+
+Finally, as an original contribution of this work, the kernelized approach proposed in \cite{colbrook_rigorous_2021} for high dimensional data was used to create a data-driven dictionary for the Gauss iterated map problem, by providing a viable way for avoiding the step of hand-crafting a problem-dependent dictionary for the EDMD and ResDMD algorithms. This novel approach provided satisfactory results for the Gauss iterated map problem, and might be worth analysing it in more details in future works.
 
 %BIBLIOGRAPHY
 \nocite{*}
