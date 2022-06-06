@@ -3,7 +3,7 @@
 clearvars -except loading
 rng(0)
 addpath(genpath(pwd))
-saving = true;
+saving = false;
 % Definition of the iteration function
 gauss_map = @(x, alpha, beta) exp(-alpha * x.^2) + beta;
 alpha = 2;

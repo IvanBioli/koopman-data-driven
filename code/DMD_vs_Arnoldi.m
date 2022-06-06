@@ -3,7 +3,7 @@
 clearvars -except loading
 rng(0);
 addpath(genpath(pwd))
-saving = true;
+saving = false;
 
 n = 400;            % Size of the matrix
 it = 60;            % Number of iterations
