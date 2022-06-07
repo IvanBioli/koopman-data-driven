@@ -72,6 +72,7 @@ if N == 20
     opts.ax = [-a, a, -a, a];
     opts.levels = log10(epsilon_vals);
     opts.no_graphics = 1;
+    figure()
     [grid,sigs] = ResDMD_pseudospectrum_v2(x0, x1, w, psi, opts, psi_0, psi_1); 
 elseif N == 100
     grid = complexgrid(-a, a, grid_points, -a, a, grid_points);
