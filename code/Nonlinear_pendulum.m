@@ -76,7 +76,7 @@ if N == 20
 elseif N == 100
     grid = complexgrid(-a, a, grid_points, -a, a, grid_points);
     if loading
-        load workspaces\pendulum_100.mat
+        load workspaces/pendulum_100.mat
     else
         [sigs, ~] = ResDMD_pseudospectrum(x0, x1, w, psi, epsilon_vals(1), grid, psi_0, psi_1);
     end

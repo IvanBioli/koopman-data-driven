@@ -142,7 +142,7 @@ valueSet = {[], [], [], []};
 errors = containers.Map(keySet, valueSet);
 Ms = round(logspace(1,4,100));
 if loading
-    load workspaces\galerkin_convergence.mat
+    load workspaces/galerkin_convergence.mat
 else
     % Computing the exact matrix
     Galerkin_exact = integral(Kfun_dot_fun, -1, 0,'ArrayValued', true);
@@ -175,7 +175,7 @@ for k = keySet
     loglog(Ms, errors(key), 'LineWidth', 1.5, 'Displayname', key);
     hold on
 end
-legend('Location','east', 'AutoUpdate','off', 'Interpreter','latex', FontSize=12)
+legend('Location','east', 'AutoUpdate','off', 'Interpreter','latex', 'FontSize', 12)
 
 Ms = Ms(Ms > 1000);
 legend_index = round(length(Ms)/2);
